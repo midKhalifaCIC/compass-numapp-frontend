@@ -9,30 +9,46 @@ imports
 // redux
 /*-----------------------------------------------------------------------------------*/
 
+import { composeWithDevTools } from "redux-devtools-extension";
+import EncryptedStorage from "react-native-encrypted-storage";
 import { combineReducers, createStore, applyMiddleware } from "redux";
 import { createLogger } from "redux-logger";
 import thunk from "redux-thunk";
 
+import { persistStore, persistReducer } from "redux-persist";
+
 // reducers
 /*-----------------------------------------------------------------------------------*/
 
-import LoginReducer from "./screens/login/loginReducer";
-import AboutReducer from "./screens/about/aboutReducer";
-import CheckInReducer from "./screens/checkIn/checkInReducer";
+import LoginReducer from "../screens/login/loginReducer";
+import AboutReducer from "./about.slice";
+import UserReducer from "./user.slice";
+import GlobalsReducer from "./globals.slice";
+import QuestionnaireReducer from "./questionnaire.slice";
+import QuestionnaireModalReducer from "./questionnaireModal.slice";
 
 // services
 /*-----------------------------------------------------------------------------------*/
 
-import localStorage from "./services/localStorage/localStorage";
+import localStorage from "../services/localStorage/localStorage";
 
 /***********************************************************************************************
 reducer
 ***********************************************************************************************/
 
+const persistConfig = {
+  key: "root",
+  storage: EncryptedStorage,
+  whitelist: ["User", "Questionnaire"],
+};
+
 const appReducer = combineReducers({
   Login: LoginReducer,
-  CheckIn: CheckInReducer,
   About: AboutReducer,
+  User: UserReducer,
+  Globals: GlobalsReducer,
+  Questionnaire: QuestionnaireReducer,
+  QuestionnaireModal: QuestionnaireModalReducer,
 });
 
 const rootReducer = (state, action) => {
@@ -71,11 +87,17 @@ middleware
 const middleware = [];
 middleware.push(thunk);
 
-if (__DEV__ && process.env.NODE_ENV !== "test")
-  middleware.push(createLogger({ collapsed: true }));
+// if (__DEV__ && process.env.NODE_ENV !== "test")
+//   middleware.push(createLogger({ collapsed: true }));
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 /***********************************************************************************************
 export
 ***********************************************************************************************/
 
-export default createStore(rootReducer, applyMiddleware(...middleware));
+export const reduxStore = createStore(
+  persistedReducer,
+  composeWithDevTools(applyMiddleware(...middleware))
+);
+export const persistor = persistStore(reduxStore);

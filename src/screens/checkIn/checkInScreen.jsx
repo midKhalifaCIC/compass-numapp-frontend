@@ -1,19 +1,26 @@
+/* eslint-disable camelcase */
 // (C) Copyright IBM Deutschland GmbH 2021.  All rights reserved.
 
 /***********************************************************************************************
 imports
 ***********************************************************************************************/
 
+import PropTypes from "prop-types";
 import React, { PureComponent } from "react";
-import { View, StyleSheet } from "react-native";
-
-import config from "../../config/configProvider";
+import { StyleSheet, View, Text } from "react-native";
 import Banner from "../../components/banner/banner";
-import Spinner from "../../components/spinner/spinner";
+import CheckInListView from "../../components/checkIn/checkInListView";
 import CheckInTiles from "../../components/checkIn/checkInTiles";
 import CheckInWelcomeText from "../../components/checkIn/welcomeText";
-import CheckInListView from "../../components/checkIn/checkInListView";
 import ScrollIndicatorWrapper from "../../components/scrollIndicatorWrapper/scrollIndicatorWrapper";
+import Spinner from "../../components/spinner/spinner";
+import config from "../../config/configProvider";
+import {
+  GlobalsProps,
+  NavigationProps,
+  QuestionnaireProps,
+  UserProps,
+} from "../../prop-types";
 
 let localStyle;
 
@@ -39,19 +46,23 @@ class CheckInScreen extends PureComponent {
   render() {
     const {
       navigation,
-      loading,
+      globals: { loading, error },
       updateUser,
-      categoriesLoaded,
-      error401,
-      questionnaireError,
-      questionnaireItemMap,
-      user,
+      user: {
+        firstTime,
+        status,
+        additional_iterations_left,
+        start_date,
+        due_date,
+      },
       sendReport,
-      noNewQuestionnaireAvailableYet,
       exportAndUploadQuestionnaireResponse,
       deleteLocalDataAndLogout,
+      questionnaire,
     } = this.props;
-
+    const noNewQuestionnaireAvailableYet = new Date() < new Date(start_date);
+    const categoriesLoaded =
+      questionnaire.categories && questionnaire.categories.length > 0;
     return (
       <View style={localStyle.wrapper}>
         {/* loading spinner */}
@@ -65,7 +76,7 @@ class CheckInScreen extends PureComponent {
           updateUser={updateUser}
           isCheckIn
           noWayBack
-          noRefresh={user?.status === "off-study"}
+          noRefresh={status === "off-study"}
           categoriesLoaded={categoriesLoaded}
         />
 
@@ -75,62 +86,67 @@ class CheckInScreen extends PureComponent {
             contentData={
               <View>
                 {/* if there is a questionnaire and no 401-error */}
-                {!error401 && questionnaireError === null && (
+                {!error ? (
                   <View
                     style={{ ...localStyle.wrapper, ...localStyle.firstItem }}
                   >
                     {/* renders the listview item representing the questionnaire */}
                     <CheckInListView
-                      user={user}
+                      status={status}
+                      questionnaireStatus={questionnaire.status}
+                      firstTime={firstTime}
                       navigation={navigation}
                       categoriesLoaded={categoriesLoaded}
-                      questionnaireItemMap={questionnaireItemMap}
+                      dueDate={due_date}
                       noNewQuestionnaireAvailableYet={
                         noNewQuestionnaireAvailableYet
                       }
+                      done={questionnaire.done}
+                      started={questionnaire.started}
                     />
                     {/* welcome text with due-date information */}
                     <CheckInWelcomeText
-                      error={error401}
-                      questionnaireError={questionnaireError}
-                      firstTime={user.firstTime}
+                      error={error}
+                      status={status}
                       noNewQuestionnaireAvailableYet={
                         noNewQuestionnaireAvailableYet
                       }
-                      user={user}
+                      firstTime={firstTime}
+                      dueDate={due_date}
+                      startDate={start_date}
+                      categoriesLoaded={categoriesLoaded}
                     />
                     {/* renders the button at the bottom */}
                     <CheckInTiles
-                      user={user}
+                      iterationsLeft={additional_iterations_left}
                       loading={loading}
                       categoriesLoaded={categoriesLoaded}
                       sendReport={sendReport}
+                      questionnaire={questionnaire}
                       deleteLocalDataAndLogout={deleteLocalDataAndLogout}
                       exportAndUploadQuestionnaireResponse={
                         exportAndUploadQuestionnaireResponse
                       }
-                      questionnaireItemMap={questionnaireItemMap}
-                      noNewQuestionnaireAvailableYet={
-                        noNewQuestionnaireAvailableYet
-                      }
                     />
                   </View>
-                )}
-
-                {/* if there is an error */}
-                {questionnaireError && (
+                ) : (
                   <View
-                    style={{ ...localStyle.wrapper, ...localStyle.firstItem }}
+                    style={[
+                      localStyle.wrapper,
+                      localStyle.flexi,
+                      localStyle.firstItem,
+                    ]}
                   >
-                    {/* displays the welcome text */}
-                    <CheckInWelcomeText
-                      user={user}
-                      error401={error401}
-                      questionnaireError={questionnaireError}
-                      noNewQuestionnaireAvailableYet={
-                        noNewQuestionnaireAvailableYet
-                      }
-                    />
+                    <Text style={localStyle.errorTitle}>
+                      {config.text.survey.noQuestionnaireTitle}
+                    </Text>
+
+                    <Text style={localStyle.errorText}>
+                      {config.text.survey.noQuestionnaireText}
+                    </Text>
+                    {/* <TouchableOpacity>
+                      <Text>{config.text.globals.refr}</Text>
+                    </TouchableOpacity> */}
                   </View>
                 )}
               </View>
@@ -142,6 +158,17 @@ class CheckInScreen extends PureComponent {
   }
 }
 
+CheckInScreen.propTypes = {
+  user: UserProps.isRequired,
+  globals: GlobalsProps.isRequired,
+  updateUser: PropTypes.func.isRequired,
+  sendReport: PropTypes.func.isRequired,
+  navigation: NavigationProps.isRequired,
+  questionnaire: QuestionnaireProps.isRequired,
+  deleteLocalDataAndLogout: PropTypes.func.isRequired,
+  exportAndUploadQuestionnaireResponse: PropTypes.func.isRequired,
+};
+
 /***********************************************************************************************
 localStyle
 ***********************************************************************************************/
@@ -152,7 +179,18 @@ localStyle = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: config.theme.values.defaultBackgroundColor,
   },
-
+  errorTitle: {
+    textAlign: "center",
+    alignSelf: "center",
+    ...config.theme.fonts.title,
+    color: config.theme.colors.alert,
+  },
+  errorText: {
+    marginTop: config.appConfig.scaleUiFkt(20),
+    textAlign: "center",
+    alignSelf: "center",
+    color: config.theme.values.defaultTitleTextColor,
+  },
   firstItem: {
     marginTop: config.appConfig.scaleUiFkt(30),
   },

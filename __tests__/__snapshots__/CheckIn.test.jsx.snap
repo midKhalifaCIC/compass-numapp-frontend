@@ -979,7 +979,72 @@ exports[`CHECKIN RENDERING: <CheckInWelcomeText /> can be rendered 1`] = `
       "marginRight": 52.325581395348834,
     }
   }
-/>
+>
+  <View>
+    <Text
+      style={
+        Object {
+          "alignSelf": "center",
+          "color": "#1F2532",
+          "fontFamily": "IBMPlexSans-SemiBold",
+          "fontSize": 45,
+          "lineHeight": 54.375,
+          "textAlign": "center",
+        }
+      }
+    >
+      CheckIn-Title
+    </Text>
+    <View>
+      <Text
+        style={
+          Object {
+            "alignSelf": "center",
+            "color": "#1F2532",
+            "fontFamily": "IBMPlexSans",
+            "fontSize": 28.125,
+            "lineHeight": 37.5,
+            "marginTop": 34.883720930232556,
+            "textAlign": "center",
+          }
+        }
+      >
+        This is the regular welcome message. It will be shown if a questionnaire is available and the user a recurring one. Below this, the due date should be displayed.
+      </Text>
+      <Text
+        style={
+          Object {
+            "alignSelf": "center",
+            "color": "#1F2532",
+            "fontFamily": "IBMPlexSans-SemiBold",
+            "fontSize": 31.875,
+            "lineHeight": 41.25,
+            "marginTop": 34.883720930232556,
+            "textAlign": "center",
+          }
+        }
+      >
+        01.01.1970, 01:00
+        .
+      </Text>
+    </View>
+    <Text
+      style={
+        Object {
+          "alignSelf": "center",
+          "color": "#1F2532",
+          "fontFamily": "IBMPlexSans",
+          "fontSize": 28.125,
+          "lineHeight": 37.5,
+          "marginTop": 34.883720930232556,
+          "textAlign": "center",
+        }
+      }
+    >
+      This is the bottom snippet of the welcomeText. You may place something useful here... like a limerick.
+    </Text>
+  </View>
+</View>
 `;
 
 exports[`CHECKIN RENDERING: <SurveyScreen /> can be rendered 1`] = `

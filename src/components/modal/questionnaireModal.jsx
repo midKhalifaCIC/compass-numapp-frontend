@@ -38,6 +38,7 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
+import PropTypes from "prop-types";
 
 import "../../typedef";
 import { Picker } from "@react-native-picker/picker";
@@ -45,6 +46,7 @@ import exportService from "../../services/questionnaireAnalyzer/questionnaireAna
 import setAccessibilityResponder from "../../services/accessibility/setAccessbilityResponder";
 import config from "../../config/configProvider";
 import ProgressBar from "./progressbar";
+import { QuestionnaireModalProps, QuestionnaireProps } from "../../prop-types";
 
 let localStyle;
 
@@ -143,7 +145,7 @@ class QuestionnaireModal extends Component {
   render = () => {
     // if there is something to render
     // eslint-disable-next-line react/destructuring-assignment
-    if (typeof this.props.currentCategoryIndex === "number") {
+    if (typeof this.props.modalState.currentCategoryIndex === "number") {
       return this.createFormContent();
     }
     // if not
@@ -169,18 +171,22 @@ class QuestionnaireModal extends Component {
    */
   componentDidUpdate = () => {
     const {
-      actions,
-      categories,
-      currentPageIndex,
-      currentCategoryIndex,
-      showQuestionnaireModal,
+      actions: { switchContent },
+      questionnaire: { categories, itemMap },
+      modalState: { currentCategoryIndex, showQuestionnaireModal },
     } = this.props;
-    if (!this.currentPageNeedsRendering && showQuestionnaireModal) {
-      actions.switchContent(
-        this.lastPageNavigationWasForwards,
-        categories[currentCategoryIndex].item.length,
-        currentPageIndex
+    if (categories && itemMap && currentCategoryIndex !== null) {
+      exportService.checkCompletionStateOfMultipleItems(
+        itemMap[categories[currentCategoryIndex].linkId].item,
+        itemMap,
+        false
       );
+    }
+    if (!this.currentPageNeedsRendering && showQuestionnaireModal) {
+      switchContent({
+        forward: this.lastPageNavigationWasForwards,
+        numberOfPages: categories[currentCategoryIndex].item.length,
+      });
     }
   };
 
@@ -313,7 +319,11 @@ class QuestionnaireModal extends Component {
    * is used to determine the color of the button on the bottom of the modal.
    */
   checkCurrentPageState = () => {
-    const { categories, currentCategoryIndex, currentPageIndex } = this.props;
+    const {
+      questionnaire: { categories, itemMap },
+      modalState: { currentCategoryIndex, currentPageIndex },
+      actions: { setMetaData },
+    } = this.props;
     return exportService.checkCompletionStateOfMultipleItems(
       [
         categories[currentCategoryIndex].item[
@@ -321,7 +331,9 @@ class QuestionnaireModal extends Component {
           currentPageIndex - 1
         ],
       ],
-      this.props
+      null,
+      itemMap,
+      setMetaData
     );
   };
 
@@ -332,9 +344,12 @@ class QuestionnaireModal extends Component {
    * "currentPageNeedsRendering"
    * @param  {QuestionnaireItem} item questionnaire-item
    */
-  getRenderStatusOfItem = (item) => {
+  getRenderStatusOfItem = (item, itemMap) => {
     // uses the checkDependenciesOfSingleItem-function from the export service
-    let returnValue = exportService.checkDependenciesOfSingleItem(item);
+    let returnValue = exportService.checkDependenciesOfSingleItem(
+      item,
+      itemMap
+    );
     // If the item is supposed to be hidden, remember the linjkId to make the subItems invisible in case there are subItems.
     if (!returnValue) {
       this.level = item.linkId;
@@ -369,9 +384,12 @@ class QuestionnaireModal extends Component {
    * @param  {QuestionnaireItem} item questionnaire item
    */
   createChoices = (item) => {
-    const { actions, questionnaireItemMap } = this.props;
+    const {
+      actions,
+      questionnaire: { itemMap },
+    } = this.props;
     // checks the dependencies of the item and renders it (if the dependencies check out)
-    return this.getRenderStatusOfItem(item) ? (
+    return this.getRenderStatusOfItem(item, itemMap) ? (
       <View>
         {/* title */}
         <Text
@@ -400,7 +418,7 @@ class QuestionnaireModal extends Component {
           <View>
             {/* renders the drop-down */}
             <Picker
-              selectedValue={questionnaireItemMap[item.linkId].answer}
+              selectedValue={itemMap[item.linkId].answer}
               onValueChange={(value) => {
                 actions.setAnswer({
                   linkId: item.linkId,
@@ -465,15 +483,15 @@ class QuestionnaireModal extends Component {
                         checked={
                           exportService.codingEquals(
                             exportService.getCorrectlyFormattedAnswer(
-                              questionnaireItemMap[item.linkId]
+                              itemMap[item.linkId]
                             ),
                             answerOption.valueCoding
                           ) ||
                           exportService.getCorrectlyFormattedAnswer(
-                            questionnaireItemMap[item.linkId]
+                            itemMap[item.linkId]
                           ) === answerOption.valueString ||
                           exportService.getCorrectlyFormattedAnswer(
-                            questionnaireItemMap[item.linkId]
+                            itemMap[item.linkId]
                           ) === answerOption.valueInteger
                         }
                       />
@@ -513,19 +531,19 @@ class QuestionnaireModal extends Component {
                           });
                         }}
                         checked={
-                          (questionnaireItemMap[item.linkId].answer &&
+                          (itemMap[item.linkId].answer &&
                             answerOption.valueCoding &&
-                            questionnaireItemMap[item.linkId].answer.some(
+                            itemMap[item.linkId].answer.some(
                               (c) =>
                                 c.code === answerOption.valueCoding.code &&
                                 c.system === answerOption.valueCoding.system
                             )) ||
-                          (questionnaireItemMap[item.linkId].answer &&
-                            questionnaireItemMap[item.linkId].answer.includes(
+                          (itemMap[item.linkId].answer &&
+                            itemMap[item.linkId].answer.includes(
                               answerOption.valueString
                             )) ||
-                          (questionnaireItemMap[item.linkId].answer &&
-                            questionnaireItemMap[item.linkId].answer.includes(
+                          (itemMap[item.linkId].answer &&
+                            itemMap[item.linkId].answer.includes(
                               answerOption.valueInteger
                             ))
                         }
@@ -574,7 +592,7 @@ class QuestionnaireModal extends Component {
   removeOpenAnswer = (item) => {
     if (item.type !== "open-choice") return;
     // eslint-disable-next-line react/destructuring-assignment
-    const a = this.props.questionnaireItemMap[item.linkId].answerOption.filter(
+    const a = this.props.questionnaire.itemMap[item.linkId].answerOption.filter(
       (e) => e.isOpenQuestionAnswer
     )[0];
     a.answer = null;
@@ -583,16 +601,18 @@ class QuestionnaireModal extends Component {
   procureOpenAnswer = (item) => {
     if (item.type !== "open-choice") return null;
     // eslint-disable-next-line react/destructuring-assignment
-    return this.props.questionnaireItemMap[item.linkId].answerOption.filter(
+    return this.props.questionnaire.itemMap[item.linkId].answerOption.filter(
       (e) => e.isOpenQuestionAnswer
     )[0].answer;
   };
 
   checkIfOpenAnswerWasChosen = (item) => {
-    const { questionnaireItemMap } = this.props;
-    const { answer } = questionnaireItemMap[item.linkId];
+    const {
+      questionnaire: { itemMap },
+    } = this.props;
+    const { answer } = itemMap[item.linkId];
 
-    questionnaireItemMap[item.linkId].answerOption.some(
+    itemMap[item.linkId].answerOption.some(
       (e) =>
         e.valueString === answer ||
         e.valueInteger === answer ||
@@ -606,7 +626,10 @@ class QuestionnaireModal extends Component {
    * @param  {QuestionnaireItem} item questionnaire item
    */
   createOpenChoices = (item) => {
-    const { actions, questionnaireItemMap } = this.props;
+    const {
+      actions,
+      questionnaire: { itemMap },
+    } = this.props;
     // checks the dependencies of the item and renders it (if the dependencies check out)
     return this.getRenderStatusOfItem(item) ? (
       <View>
@@ -654,19 +677,19 @@ class QuestionnaireModal extends Component {
                 })
               }
               checked={
-                (questionnaireItemMap[item.linkId].answer &&
+                (itemMap[item.linkId].answer &&
                   answerOption.valueCoding &&
-                  questionnaireItemMap[item.linkId].answer.some(
+                  itemMap[item.linkId].answer.some(
                     (c) =>
                       c.code === answerOption.valueCoding.code &&
                       c.system === answerOption.valueCoding.system
                   )) ||
-                (questionnaireItemMap[item.linkId].answer &&
-                  questionnaireItemMap[item.linkId].answer.includes(
+                (itemMap[item.linkId].answer &&
+                  itemMap[item.linkId].answer.includes(
                     answerOption.valueString
                   )) ||
-                (questionnaireItemMap[item.linkId].answer &&
-                  questionnaireItemMap[item.linkId].answer.includes(
+                (itemMap[item.linkId].answer &&
+                  itemMap[item.linkId].answer.includes(
                     answerOption.valueInteger
                   ))
               }
@@ -689,7 +712,10 @@ class QuestionnaireModal extends Component {
    * @param  {QuestionnaireItem} item questionnaire item
    */
   createBoolean = (item) => {
-    const { actions, questionnaireItemMap } = this.props;
+    const {
+      actions,
+      questionnaire: { itemMap },
+    } = this.props;
     // checks the dependencies of the item and renders it (if the dependencies check out)
     return this.getRenderStatusOfItem(item) ? (
       <View>
@@ -697,16 +723,16 @@ class QuestionnaireModal extends Component {
           title={item.text}
           checkedColor={config.theme.colors.primary}
           uncheckedColor={config.theme.colors.accent1}
-          checked={questionnaireItemMap[item.linkId].answer}
+          checked={itemMap[item.linkId].answer}
           onPress={() =>
             actions.setAnswer({
               linkId: item.linkId,
               answer:
                 exportService.getCorrectlyFormattedAnswer(
-                  questionnaireItemMap[item.linkId]
+                  itemMap[item.linkId]
                 ) === null
                   ? true
-                  : !questionnaireItemMap[item.linkId].answer,
+                  : !itemMap[item.linkId].answer,
             })
           }
           onIconPress={() =>
@@ -714,10 +740,10 @@ class QuestionnaireModal extends Component {
               linkId: item.linkId,
               answer:
                 exportService.getCorrectlyFormattedAnswer(
-                  questionnaireItemMap[item.linkId]
+                  itemMap[item.linkId]
                 ) === null
                   ? true
-                  : !questionnaireItemMap[item.linkId].answer,
+                  : !itemMap[item.linkId].answer,
             })
           }
           key={`${item.linkId}`}
@@ -738,16 +764,19 @@ class QuestionnaireModal extends Component {
    * @param  {QuestionnaireItem} item questionnaire item
    */
   createInput = (item) => {
-    const { actions, questionnaireItemMap } = this.props;
+    const {
+      actions,
+      questionnaire: { itemMap },
+    } = this.props;
     // checks the dependencies of the item and renders it (if the dependencies check out)
-    return this.getRenderStatusOfItem(item) ? (
+    return this.getRenderStatusOfItem(item, itemMap) ? (
       <View style={localStyle.modalInput}>
         {/* title */}
         <Text style={{ ...localStyle.contentTitle }}>{item.text}</Text>
         {/* input */}
         <Input
           placeholder={config.text.login.inputPlaceholder}
-          value={questionnaireItemMap[item.linkId].answer || ""} // displays an empty string when a 'falsy' answer needs to be rendered
+          value={itemMap[item.linkId].answer || ""} // displays an empty string when a 'falsy' answer needs to be rendered
           keyboardType={this.getKeyboardType(item)}
           maxLength={item.maxLength || null}
           // accessibilityLabel={ }
@@ -792,7 +821,11 @@ class QuestionnaireModal extends Component {
    * @param  {QuestionnaireItem} item questionnaire item
    */
   createDatePicker = (item) => {
-    const { actions, questionnaireItemMap, showDatePicker } = this.props;
+    const {
+      actions,
+      questionnaire: { itemMap },
+      modalState: { showDatePicker },
+    } = this.props;
     // checks the dependencies of the item and renders it (if the dependencies check out)
     return this.getRenderStatusOfItem(item) ? (
       <View style={localStyle.modalInput}>
@@ -810,9 +843,9 @@ class QuestionnaireModal extends Component {
             <Input
               placeholder={config.text.login.inputPlaceholderTime}
               value={
-                questionnaireItemMap[item.linkId].answer
+                itemMap[item.linkId].answer
                   ? exportService.getFormattedDate(
-                      questionnaireItemMap[item.linkId].answer.toString(),
+                      itemMap[item.linkId].answer.toString(),
                       true
                     )
                   : null
@@ -826,7 +859,7 @@ class QuestionnaireModal extends Component {
 
         {showDatePicker && (
           <DateTimePicker
-            value={questionnaireItemMap[item.linkId].answer || new Date()}
+            value={itemMap[item.linkId].answer || new Date()}
             mode="date"
             locale="de-de"
             display="spinner"
@@ -859,8 +892,7 @@ class QuestionnaireModal extends Component {
               title={config.text.generic.ok}
               color={config.theme.colors.secondary}
               onPress={() => {
-                const selectedDate =
-                  questionnaireItemMap[item.linkId].answer || new Date();
+                const selectedDate = itemMap[item.linkId].answer || new Date();
                 actions.setAnswer({
                   linkId: item.linkId,
                   answer: selectedDate,
@@ -881,7 +913,10 @@ class QuestionnaireModal extends Component {
    * @param  {QuestionnaireItem} item questionnaire item
    */
   createSlider = (item) => {
-    const { actions, questionnaireItemMap } = this.props;
+    const {
+      actions,
+      questionnaire: { itemMap },
+    } = this.props;
     // creates the default slider-object
     const sliderProperties = Object.create({
       "questionnaire-sliderStepVal": 1,
@@ -928,8 +963,8 @@ class QuestionnaireModal extends Component {
             });
           }}
           value={
-            typeof questionnaireItemMap[item.linkId].answer === "number"
-              ? questionnaireItemMap[item.linkId].answer
+            typeof itemMap[item.linkId].answer === "number"
+              ? itemMap[item.linkId].answer
               : (sliderProperties.minValue + sliderProperties.maxValue) / 2
           }
         />
@@ -1026,7 +1061,7 @@ class QuestionnaireModal extends Component {
         // renders the UI Element and then creates another sub-view for the sub-items (if applicable)
         this.getSecondIndexOfLinkId(item.linkId) ===
           // eslint-disable-next-line react/destructuring-assignment
-          this.props.currentPageIndex.toString() && (
+          this.props.modalState.currentPageIndex.toString() && (
           <View key={item.linkId}>
             {this.createUIElement(item)}
             {item.item && this.createItemView(item.item)}
@@ -1040,7 +1075,10 @@ class QuestionnaireModal extends Component {
    * triggers createItemView()
    */
   createModalContent = () => {
-    const { categories, currentCategoryIndex } = this.props;
+    const {
+      questionnaire: { categories },
+      modalState: { currentCategoryIndex },
+    } = this.props;
     return (
       <View style={localStyle.content}>
         <ScrollView
@@ -1069,8 +1107,14 @@ class QuestionnaireModal extends Component {
    * creates the bottom-navigation-bar of the modal
    */
   createBottomBar = () => {
-    const { currentPageIndex, currentCategoryIndex, categories, actions } =
-      this.props;
+    const {
+      modalState: { currentPageIndex, currentCategoryIndex },
+      questionnaire: { categories, itemMap },
+      actions,
+    } = this.props;
+    const linkIdOfCurrentPage =
+      categories[currentCategoryIndex].item[currentPageIndex - 1].linkId;
+    const pageDone = itemMap[linkIdOfCurrentPage].done;
     return (
       <View
         style={
@@ -1083,7 +1127,11 @@ class QuestionnaireModal extends Component {
           <ProgressBar
             progress={
               config.appConfig.useStrictModeProgressBar
-                ? exportService.calculatePageProgress(this.props)
+                ? exportService.calculatePageProgress(
+                    categories,
+                    currentCategoryIndex,
+                    currentPageIndex
+                  )
                 : currentPageIndex /
                   categories[currentCategoryIndex].item.length
             }
@@ -1103,7 +1151,7 @@ class QuestionnaireModal extends Component {
               onPress={() => {
                 setAccessibilityResponder(this.modalTitleRef);
                 this.lastPageNavigationWasForwards = false;
-                actions.switchContent(false);
+                actions.switchContent({ forward: false });
                 this.handleScrollTo({ y: 0, animated: false });
               }}
               style={localStyle.modalPaginationButton}
@@ -1131,7 +1179,7 @@ class QuestionnaireModal extends Component {
           <Button
             type="clear"
             accessibilityLabel={
-              this.checkCurrentPageState()
+              pageDone
                 ? config.text.accessibility.questionnaire.middleButtonFinished
                 : config.text.accessibility.questionnaire.middleButtonUnfinished
             }
@@ -1142,11 +1190,10 @@ class QuestionnaireModal extends Component {
             onPress={() => {
               setAccessibilityResponder(this.modalTitleRef);
               this.lastPageNavigationWasForwards = true;
-              actions.switchContent(
-                true,
-                categories[currentCategoryIndex].item.length,
-                currentPageIndex
-              );
+              actions.switchContent({
+                forward: true,
+                numberOfPages: categories[currentCategoryIndex].item.length,
+              });
               this.handleScrollTo({ y: 0, animated: false });
             }}
             icon={
@@ -1155,7 +1202,7 @@ class QuestionnaireModal extends Component {
                 reverse
                 type="material-community"
                 color={
-                  this.checkCurrentPageState()
+                  pageDone
                     ? config.theme.colors.success
                     : config.theme.colors.accent4
                 }
@@ -1178,7 +1225,7 @@ class QuestionnaireModal extends Component {
                 if (!this.isAccessibilityOn) {
                   setAccessibilityResponder(this.modalTitleRef);
                   this.lastPageNavigationWasForwards = true;
-                  actions.switchContent(true);
+                  actions.switchContent({ forward: true });
                   this.handleScrollTo({ y: 0, animated: false });
                 } else {
                   // when accessibility features are enabled, user should be able to close modal with this button
@@ -1215,7 +1262,11 @@ class QuestionnaireModal extends Component {
    * creates the modal itself if categories are loaded
    */
   createFormContent = () => {
-    const { showQuestionnaireModal, actions, categories } = this.props;
+    const {
+      modalState: { showModal },
+      actions,
+      questionnaire: { categories, itemMap },
+    } = this.props;
     return (
       <View>
         {categories && (
@@ -1228,14 +1279,15 @@ class QuestionnaireModal extends Component {
             swipeDirection={["down"]}
             scrollTo={this.handleScrollTo}
             scrollOffset={this.scrollOffset}
-            isVisible={showQuestionnaireModal}
-            onBackdropPress={actions.hideQuestionnaireModal}
-            onSwipeComplete={actions.hideQuestionnaireModal}
-            onBackButtonPress={actions.hideQuestionnaireModal}
+            isVisible={showModal}
+            onBackdropPress={() => actions.hideModal()}
+            onSwipeComplete={() => actions.hideModal()}
+            onBackButtonPress={() => actions.hideModal()}
             onModalWillHide={() =>
               exportService.checkCompletionStateOfMultipleItems(
-                null,
-                this.props
+                categories,
+                itemMap,
+                true
               )
             }
           >
@@ -1250,6 +1302,12 @@ class QuestionnaireModal extends Component {
     );
   };
 }
+
+QuestionnaireModal.propTypes = {
+  questionnaire: QuestionnaireProps.isRequired,
+  modalState: QuestionnaireModalProps.isRequired,
+  actions: PropTypes.objectOf(PropTypes.func).isRequired,
+};
 
 /***********************************************************************************************
 styles

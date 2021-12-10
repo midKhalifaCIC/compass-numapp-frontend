@@ -8,13 +8,13 @@ import React from "react";
 import { Alert } from "react-native";
 import { renderWithRedux, initRenderModule } from "../__utils__/render";
 
-import store from "../src/store";
+import store from "../src/redux/store";
 import SurveyScreen from "../src/screens/checkIn/surveyScreen";
 import WelcomeText from "../src/components/checkIn/welcomeText";
 import * as actions from "../src/screens/checkIn/checkInActions";
 import CheckInScreen from "../src/screens/checkIn/checkInScreen";
 import CheckInTiles from "../src/components/checkIn/checkInTiles";
-import { CheckInContainer } from "../src/screens/checkIn/checkInContainer";
+import CheckInContainer from "../src/screens/checkIn/checkInContainer";
 import CheckInListView from "../src/components/checkIn/checkInListView";
 import questionnaireAnalyzer from "../src/services/questionnaireAnalyzer/questionnaireAnalyzer";
 import loggedInClient from "../src/services/rest/loggedInClient";
@@ -337,7 +337,7 @@ describe("QUESTIONNAIRE HANDLING:", () => {
     // initiates a global mock-redux-store
     const mockStore = initRenderModule(initialState);
     store.getState = () => mockStore.getState();
-    jest.mock("../src/store.js");
+    jest.mock("../src/redux/store.js");
 
     // renders the component
     const tree = renderWithRedux(

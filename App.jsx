@@ -4,15 +4,16 @@
 imports
 ***********************************************************************************************/
 
-import { Provider } from "react-redux";
 import React, { PureComponent } from "react";
+import { LogBox, Platform, StatusBar, StyleSheet, View } from "react-native";
 import SplashScreen from "react-native-splash-screen";
-import { StyleSheet, View, StatusBar, LogBox, Platform } from "react-native";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
+import Spinner from "./src/components/spinner/spinner";
 import config from "./src/config/configProvider";
-
-import reduxStore from "./src/store";
-import createAppNavigator from "./src/navigation/appNavigator";
+import AppNavigator from "./src/navigation/appNavigator";
+import { persistor, reduxStore } from "./src/redux/store";
 
 /***********************************************************************************************
 Component
@@ -44,8 +45,11 @@ class App extends PureComponent {
             }
           />
         )}
-
-        <Provider store={reduxStore}>{createAppNavigator()}</Provider>
+        <Provider store={reduxStore}>
+          <PersistGate loading={<Spinner visible />} persistor={persistor}>
+            <AppNavigator />
+          </PersistGate>
+        </Provider>
       </View>
     );
   }

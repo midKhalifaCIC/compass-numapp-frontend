@@ -4,8 +4,9 @@
 import
 ***********************************************************************************************/
 
+import PropTypes from "prop-types";
 import React, { PureComponent } from "react";
-import { StyleSheet, View, Modal, ActivityIndicator } from "react-native";
+import { ActivityIndicator, Modal, StyleSheet, View } from "react-native";
 
 import config from "../../config/configProvider";
 
@@ -41,6 +42,10 @@ class Spinner extends PureComponent {
     );
   }
 }
+
+Spinner.propTypes = {
+  visible: PropTypes.bool.isRequired,
+};
 
 /***********************************************************************************************
 local styling

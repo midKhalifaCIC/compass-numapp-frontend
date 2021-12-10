@@ -20,9 +20,10 @@
 imports
 ***********************************************************************************************/
 
-import "../../typedef";
-import store from "../../store";
 import config from "../../config/configProvider";
+import { questionnaireActions } from "../../redux";
+import { reduxStore as store } from "../../redux/store";
+import "../../typedef";
 
 /***********************************************************************************************
 service methods
@@ -37,14 +38,14 @@ service methods
  * was correctly answered.
  * @param {string} linkId linkId of a questionnaire-item
  */
-const checkRegExExtension = (linkId) => {
-  const props = store.getState().CheckIn;
+const checkRegExExtension = (linkId, itemMap) => {
+  // const { itemMap } = store.getState().Questionnaire;
 
   /**
    * the item that owns the extension
    * @type {QuestionnaireItem}
    */
-  const item = props.questionnaireItemMap[linkId];
+  const item = itemMap[linkId];
 
   const itemControlExtension = item?.extension?.find(
     (e) => e.url === "http://hl7.org/fhir/StructureDefinition/regex"
@@ -52,7 +53,7 @@ const checkRegExExtension = (linkId) => {
 
   if (itemControlExtension?.valueString) {
     return RegExp(itemControlExtension.valueString).test(
-      props.questionnaireItemMap[item.linkId].answer
+      itemMap[item.linkId].answer
     );
   }
 
@@ -82,12 +83,13 @@ const getEnableWhenAnswerType = (condition) => {
  * if not, the condition is automatically not set. this is due to the fact that right now
  * only the-comparison-operator ("=") is available for conditional rendering
  * @param  {QuestionnaireItem} item questionnaire item
+ * @param {Map<String, QuestionnaireItem>} itemMap
  */
-const checkIfAnswersToConditionsAreAvailable = (item) => {
+const checkIfAnswersToConditionsAreAvailable = (item, itemMap) => {
   /** return value of the function, tells if answer conditions are available */
   let available;
 
-  const props = store.getState().CheckIn;
+  // const props = store.getState().CheckIn;
 
   // if enableBehavior is "all" (or not set)
   if (
@@ -100,8 +102,7 @@ const checkIfAnswersToConditionsAreAvailable = (item) => {
     // iterates over all conditions
     item.enableWhen.forEach((condition) => {
       // sets the return value to FALSE should a single condition not be met
-      if (!props.questionnaireItemMap[condition.question].answer)
-        available = false;
+      if (!itemMap[condition.question].answer) available = false;
     });
 
     return available;
@@ -114,7 +115,7 @@ const checkIfAnswersToConditionsAreAvailable = (item) => {
   // iterates over all conditions
   item.enableWhen.forEach((condition) => {
     // sets the return value to TRUE if a single condition is met
-    if (props.questionnaireItemMap[condition.question].answer) available = true;
+    if (itemMap[condition.question].answer) available = true;
   });
 
   return available;
@@ -124,16 +125,20 @@ const checkIfAnswersToConditionsAreAvailable = (item) => {
  * calculates the relative progress of navigating through a category
  * @param  {object} [props] props-object of the calling component
  */
-const calculatePageProgress = (props) => {
+const calculatePageProgress = (
+  categories,
+  currentCategoryIndex,
+  currentPageIndex
+) => {
   let pageIndex = 0;
   let pageCountRead = 0;
   let pageCountRemaining = 0;
 
-  props.categories[props.currentCategoryIndex].item.forEach((item) => {
+  categories[currentCategoryIndex].item.forEach((item) => {
     if (checkDependenciesOfSingleItem(item)) {
       pageCountRemaining += 1;
 
-      if (pageIndex < props.currentPageIndex) pageCountRead += 1;
+      if (pageIndex < currentPageIndex) pageCountRead += 1;
     }
     pageIndex += 1;
   });
@@ -155,12 +160,12 @@ const checkItem = (item, questionnaireItemMap) => {
     item.type === "ignore" ||
     !item.required ||
     item.type === "display" ||
-    !checkDependenciesOfSingleItem(item)
+    !checkDependenciesOfSingleItem(item, questionnaireItemMap)
   ) {
     returnValue = true;
   }
   // if the item does not met its own regEx
-  else if (!checkRegExExtension(item.linkId)) {
+  else if (!checkRegExExtension(item.linkId, questionnaireItemMap)) {
     returnValue = false;
   } else {
     // if its a boolean
@@ -224,8 +229,14 @@ const checkItem = (item, questionnaireItemMap) => {
   }
 
   // sets the done property of the item
-  // eslint-disable-next-line no-param-reassign
-  questionnaireItemMap[item.linkId].done = returnValue;
+  if (questionnaireItemMap[item.linkId].done !== returnValue) {
+    store.dispatch(
+      questionnaireActions.setItemStatus({
+        linkId: item.linkId,
+        done: returnValue,
+      })
+    );
+  }
 
   return returnValue;
 };
@@ -368,46 +379,44 @@ const getCorrectlyFormattedAnswer = (item) => {
  * needs to be checked) and iterates over all active (as in they met their enableWhen-conditions)
  * sub-items to check if they are valid.
  * @param  {QuestionnaireItem[]} [items] the items property of a questionnaire-item (from the categories-array)
- * @param  {object} [props] props-object of the calling component (needed to call an action)
+ * @param  {object} itemMap the itemMap containing all questions with corresponding answers
+ * @param  {object} isRoot whether or not
  */
-const checkCompletionStateOfMultipleItems = (items, props) => {
+const checkCompletionStateOfMultipleItems = (items, itemMap, isRoot) => {
   /**
    * local copy of the categories-array from the checkIn-state
    * @type {QuestionnaireItem[]}
    */
-  const categories = items || props.categories;
+  // const categories = items || props.categories;
 
   /**
    * local copy of the questionnaireItemMap from the checkIn-state
    * @type {QuestionnaireItemMap}
    */
-  const questionnaireItemMap = { ...props.questionnaireItemMap, done: true };
+  // const questionnaireItemMap = props.questionnaire.itemMap;
 
   // if a set of items was given
-  if (items) {
-    /** return value of the function */
-    let returnValue = true;
-
+  if (!isRoot) {
     // sets the returnValue to false if a single item does not check out
     items.forEach((item) => {
-      if (!checkItem(item, questionnaireItemMap)) returnValue = false;
+      checkItem(item, itemMap);
+    });
+  } else {
+    let done = true;
+    // if there is no set, go over all categories
+
+    // sets the done-property for the whole questionnaire
+    items.forEach((item) => {
+      if (!checkItem(item, itemMap)) {
+        done = false;
+      }
     });
 
-    return returnValue;
+    if (done)
+      store.dispatch(
+        questionnaireActions.setQuestionnaireStatus({ done: true })
+      );
   }
-  // if there is no set, go over all categories
-
-  // sets the done-property for the whole questionnaire
-  categories.forEach((category) => {
-    if (!checkItem(category, questionnaireItemMap)) {
-      questionnaireItemMap.done = false;
-    }
-  });
-
-  // persists the new questionnaireItemMap
-  props.actions.setQuestionnaireItemMap(questionnaireItemMap);
-
-  return questionnaireItemMap.done;
 };
 
 /**
@@ -437,9 +446,7 @@ const codingEquals = (coding1, coding2) => {
  * an impact on the completion state of the whole questionnaire
  * @param  {QuestionnaireItem} [item] questionnaire item
  */
-const checkDependenciesOfSingleItem = (item) => {
-  const props = store.getState().CheckIn;
-
+const checkDependenciesOfSingleItem = (item, itemMap) => {
   // if item is supposed to be hidden
   const hiddenExtension = item.extension?.find(
     (it) =>
@@ -451,7 +458,7 @@ const checkDependenciesOfSingleItem = (item) => {
   if (item && item.enableWhen) {
     // if the item has a set of conditions
     // checks if the items mentioned in the conditions are even answered...
-    if (!checkIfAnswersToConditionsAreAvailable(item)) {
+    if (!checkIfAnswersToConditionsAreAvailable(item, itemMap)) {
       // ...if not, the returnValue is set to FALSE - game over
       return false;
     }
@@ -459,7 +466,7 @@ const checkDependenciesOfSingleItem = (item) => {
       const elementTestCallback = (condition) => {
         const answerType = getEnableWhenAnswerType(condition);
         const expected = condition[answerType];
-        const question = props.questionnaireItemMap[condition.question];
+        const question = itemMap[condition.question];
 
         if (answerType === "answerCoding") {
           return (
@@ -492,14 +499,14 @@ const checkDependenciesOfSingleItem = (item) => {
  * this creates the document that, as soon as encrypted, will be sent to the backend
  * @returns {ExportData}
  */
-const createResponseJSON = () => {
+const createResponseJSON = (categories, itemMap, questionnaireMeta) => {
   /** persists the information if a trigger was... well, triggered
    * @type {Object.<string, boolean>}
    */
   const triggerMap = {};
 
   /** a local copy of the checkIn-state */
-  const props = store.getState().CheckIn;
+  // const props = store.getState().CheckIn;
 
   /**
    * return the correct answer object
@@ -543,11 +550,11 @@ const createResponseJSON = () => {
          * holds the correct itemdetails
          * @type {ItemMapEntry}
          */
-        const itemDetails = props.questionnaireItemMap[item.linkId];
+        const itemDetails = itemMap[item.linkId];
 
         // if the conditions of the item are met or if one of the ChildItems provide the necessary answer
         if (
-          checkDependenciesOfSingleItem(item) ||
+          checkDependenciesOfSingleItem(item, itemMap) ||
           (necessaryAnswer &&
             itemDetails.enableWhen &&
             itemDetails.enableWhen[0][
@@ -766,11 +773,11 @@ const createResponseJSON = () => {
    */
   const questionnaireResponse = {
     authored: new Date().toISOString(),
-    item: createItems(props.categories),
+    item: createItems(categories),
     resourceType: "QuestionnaireResponse",
-    questionnaire: props.questionnaireItemMap.url,
-    identifier: props.questionnaireItemMap.identifier,
-    status: props.questionnaireItemMap.done ? "completed" : "in-progress",
+    questionnaire: questionnaireMeta.url,
+    identifier: questionnaireMeta.identifier,
+    status: questionnaireMeta.done ? "completed" : "in-progress",
   };
 
   // removes empty entries
@@ -778,7 +785,7 @@ const createResponseJSON = () => {
 
   // console output
   if (config.appConfig.logPureResponse) {
-    console.log("THE QUESTIONNAIRE-RESPONSE:", questionnaireResponse);
+    console.logch("THE QUESTIONNAIRE-RESPONSE:", questionnaireResponse);
   }
   if (config.appConfig.logPureResponseJSON) {
     console.log(
@@ -789,7 +796,7 @@ const createResponseJSON = () => {
 
   return {
     triggerMap,
-    body: JSON.stringify(questionnaireResponse),
+    body: questionnaireResponse,
   };
 };
 

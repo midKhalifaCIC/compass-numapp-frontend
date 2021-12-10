@@ -8,7 +8,7 @@ import React, { PureComponent } from "react";
 import { WebView } from "react-native-webview";
 import { View, StyleSheet } from "react-native";
 
-import store from "../../store";
+import store from "../../redux/store";
 import config from "../../config/configProvider";
 import Banner from "../../components/banner/banner";
 

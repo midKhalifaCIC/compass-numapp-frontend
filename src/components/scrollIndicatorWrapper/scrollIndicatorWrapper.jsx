@@ -136,6 +136,7 @@ export default class ScrollIndicatorWrapper extends Component {
             // applies the updates
             this.forceUpdate();
           }}
+          scrollEventThrottle={16}
         >
           {/* the content */}
           {contentData}

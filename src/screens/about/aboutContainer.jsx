@@ -14,7 +14,10 @@ import text from "../../config/textConfig";
 import AboutScreen from "./aboutScreen";
 import WebViewScreen from "./webViewScreen";
 import LegalInformationScreen from "./legalInformationScreen";
-import * as aboutActions from "./aboutActions";
+// import * as aboutActions from "../redux";
+import { userActions, sharedActions } from "../../redux";
+
+import { persistor } from "../../redux/store";
 
 /***********************************************************************************************
 component:
@@ -45,9 +48,9 @@ class AboutContainer extends Component {
         {
           text: text.generic.delete,
           onPress: () => {
-            actions.logout();
-            actions.deleteLocalData();
-            navigation.navigate("SignedOut", { screen: "Landing" });
+            // actions.logout();
+            actions.deleteAll();
+            navigation.navigate("Landing");
           },
         },
         {
@@ -72,9 +75,9 @@ class AboutContainer extends Component {
         {
           text: text.generic.goBack,
           onPress: () => {
-            actions.logout();
+            actions.logout(false);
             setTimeout(() => {
-              navigation.navigate("SignedOut", { screen: "Landing" });
+              navigation.navigate("Landing");
             }, 0);
           },
         },
@@ -91,7 +94,12 @@ class AboutContainer extends Component {
   /*-----------------------------------------------------------------------------------*/
 
   render() {
-    const { navigation, showModal, modalLink, actions, route } = this.props;
+    const {
+      about: { showModal, modalLink },
+      route,
+      actions,
+      navigation,
+    } = this.props;
     // checks if the currently selected route equals 'About'
     if (route.name === "About") {
       // then renders the About Screen
@@ -109,10 +117,10 @@ class AboutContainer extends Component {
     // checks if the currently selected route equals 'LegalInformation'
     if (route.name === "LegalInformation") {
       // then renders the LegalInformation Screen
-      return <LegalInformationScreen navigation={navigation} />;
+      return <LegalInformationScreen />;
     }
     // if on WebView route
-    return <WebViewScreen navigation={navigation} />;
+    return <WebViewScreen />;
   }
 }
 
@@ -124,10 +132,10 @@ redux
 // updated properties are then available from the state. actions can be accessed through
 // props.actions.
 
-const mapStateToProps = (state) => state.About;
+const mapStateToProps = (state) => ({ about: state.About, user: state.User });
 
 const mapDispatchToProps = (dispatch) => ({
-  actions: bindActionCreators(aboutActions, dispatch),
+  actions: bindActionCreators({ ...userActions, ...sharedActions }, dispatch),
 });
 
 /***********************************************************************************************

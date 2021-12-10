@@ -6,6 +6,7 @@ imports
 
 import React, { PureComponent } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import PropTypes from "prop-types";
 
 import { ListItem } from "react-native-elements";
 import RedirectModal from "../../components/modal/redirectModal";
@@ -13,6 +14,7 @@ import Banner from "../../components/banner/banner";
 import AboutListItem from "../../components/about/aboutListItem";
 import AboutListLink from "../../components/about/aboutListLink";
 import ScrollIndicatorWrapper from "../../components/scrollIndicatorWrapper/scrollIndicatorWrapper";
+import { NavigationProps } from "../../prop-types";
 
 import config from "../../config/configProvider";
 
@@ -157,6 +159,15 @@ class AboutScreen extends PureComponent {
     );
   }
 }
+
+AboutScreen.propTypes = {
+  navigation: NavigationProps.isRequired,
+  logout: PropTypes.func.isRequired,
+  actions: PropTypes.objectOf(PropTypes.func).isRequired,
+  clearAll: PropTypes.func.isRequired,
+  showModal: PropTypes.bool.isRequired,
+  modalLink: PropTypes.shape({}).isRequired,
+};
 
 /***********************************************************************************************
 local styling

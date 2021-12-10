@@ -197,7 +197,7 @@ const valuesHandlers = {
     setTimeout(() => {
       localStorage.persistQuestionnaireItemMap(
         questionnaireItemMap,
-        state.user.subjectId
+        state.User.subjectId
       );
     }, 0);
 

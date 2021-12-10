@@ -4,14 +4,21 @@
 imports
 ***********************************************************************************************/
 
+import PropTypes from "prop-types";
 import React, { Component } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ListItem } from "react-native-elements";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-
-import config from "../../config/configProvider";
 import Banner from "../../components/banner/banner";
 import QuestionnaireModal from "../../components/modal/questionnaireModal";
 import ScrollIndicatorWrapper from "../../components/scrollIndicatorWrapper/scrollIndicatorWrapper";
+import Spinner from "../../components/spinner/spinner";
+import config from "../../config/configProvider";
+import {
+  GlobalsProps,
+  NavigationProps,
+  QuestionnaireModalProps,
+  QuestionnaireProps,
+} from "../../prop-types";
 
 let localStyle;
 
@@ -36,25 +43,21 @@ class SurveyScreen extends Component {
    * @returns a string as accessibility hint
    */
   getAccessibilityHint = (category) => {
-    const { questionnaireItemMap } = this.props;
+    const {
+      questionnaire: { itemMap },
+    } = this.props;
     let hint = config.text.accessibility.questionnaire.categoryCellHint;
-    if (
-      !questionnaireItemMap[category.linkId].done &&
-      questionnaireItemMap[category.linkId].started
-    ) {
+    if (!itemMap[category.linkId].done && itemMap[category.linkId].started) {
       return (hint +=
         config.text.accessibility.questionnaire.category +
         config.text.accessibility.questionnaire.notFinished);
     }
-    if (
-      !questionnaireItemMap[category.linkId].done &&
-      questionnaireItemMap[category.linkId].started
-    ) {
+    if (!itemMap[category.linkId].done && itemMap[category.linkId].started) {
       return (hint +=
         config.text.accessibility.questionnaire.category +
         config.text.accessibility.questionnaire.notStarted);
     }
-    if (questionnaireItemMap[category.linkId].done) {
+    if (itemMap[category.linkId].done) {
       return (hint +=
         config.text.accessibility.questionnaire.category +
         config.text.accessibility.questionnaire.finished);
@@ -63,8 +66,10 @@ class SurveyScreen extends Component {
   };
 
   getCategoryChevronProps = (category) => {
-    const { questionnaireItemMap } = this.props;
-    const categoryState = questionnaireItemMap[category.linkId];
+    const {
+      questionnaire: { itemMap },
+    } = this.props;
+    const categoryState = itemMap[category.linkId];
     if (categoryState.done) {
       return {
         name: "check",
@@ -88,7 +93,10 @@ class SurveyScreen extends Component {
    * with the the sub-questions from that category loaded
    */
   createListView = () => {
-    const { actions, categories } = this.props;
+    const {
+      actions,
+      questionnaire: { categories },
+    } = this.props;
     if (categories)
       return (
         <View style={localStyle.wrapper}>
@@ -100,7 +108,7 @@ class SurveyScreen extends Component {
               <ListItem
                 key={category.linkId}
                 containerStyle={localStyle.listItemContainer}
-                onPress={() => actions.showQuestionnaireModal(index)}
+                onPress={() => actions.showModal(index)}
                 accessibilityLabel={category.text}
                 accessibilityRole={config.text.accessibility.types.button}
                 accessibilityHint={this.getAccessibilityHint(category)}
@@ -131,17 +139,16 @@ class SurveyScreen extends Component {
 
   render() {
     const {
+      globals: { loading },
       actions,
       navigation,
-      showDatePicker,
-      categories,
-      currentPageIndex,
-      currentCategoryIndex,
-      questionnaireItemMap,
-      showQuestionnaireModal,
+      questionnaire,
+      questionnaireModal,
       exportAndUploadQuestionnaireResponse,
     } = this.props;
-    return (
+    return loading || !questionnaire.categories ? (
+      <Spinner visible testID="checkInSpinner" />
+    ) : (
       <View style={{ ...localStyle.flexi, ...localStyle.wrapper }}>
         {/* render the top banner */}
         <Banner nav={navigation} title={config.text.survey.title} />
@@ -149,12 +156,8 @@ class SurveyScreen extends Component {
         {/* the questionnaire modal */}
         <QuestionnaireModal
           actions={actions}
-          categories={categories}
-          showDatePicker={showDatePicker}
-          currentPageIndex={currentPageIndex}
-          currentCategoryIndex={currentCategoryIndex}
-          showQuestionnaireModal={showQuestionnaireModal}
-          questionnaireItemMap={questionnaireItemMap}
+          questionnaire={questionnaire}
+          modalState={questionnaireModal}
         />
 
         <ScrollIndicatorWrapper
@@ -165,7 +168,7 @@ class SurveyScreen extends Component {
 
               {/* renders a send-button at the bottom if the questionnaire is completed */}
               <View style={localStyle.bottom}>
-                {questionnaireItemMap && questionnaireItemMap.done && (
+                {questionnaire.done && (
                   <TouchableOpacity
                     accessibilityLabel={config.text.survey.send}
                     accessibilityRole={config.text.accessibility.types.button}
@@ -191,6 +194,19 @@ class SurveyScreen extends Component {
     );
   }
 }
+
+SurveyScreen.propTypes = {
+  globals: GlobalsProps.isRequired,
+  questionnaire: QuestionnaireProps.isRequired,
+  questionnaireModal: QuestionnaireModalProps.isRequired,
+  actions: PropTypes.objectOf(PropTypes.func).isRequired,
+  exportAndUploadQuestionnaireResponse: PropTypes.func,
+  navigation: NavigationProps.isRequired,
+};
+
+SurveyScreen.defaultProps = {
+  exportAndUploadQuestionnaireResponse: () => {},
+};
 
 /***********************************************************************************************
 localStyle

@@ -21,11 +21,6 @@ renders the login-screen
 ***********************************************************************************************/
 
 class LoginScreen extends Component {
-  /**
-   * reference to access the camera
-   * @type {object}
-   */
-  camera;
 
   /**
    * @constructor
@@ -36,10 +31,6 @@ class LoginScreen extends Component {
    * @param  {boolean}   props.loginUnauthorized if true: the last authentication attempt returned a 401
    * @param  {object}    props.loginError the persisted error of the last authentication attempt
    */
-  constructor(props) {
-    super(props);
-    this.camera = React.createRef();
-  }
 
   // rendering
   /*-----------------------------------------------------------------------------------*/
@@ -66,13 +57,10 @@ class LoginScreen extends Component {
                   <View>
                     {/* the qr-code-scanner */}
                     <QRCodeScanner
-                      fadeIn={false}
+                      
                       showMarker
                       cameraStyle={localStyle.qrScanner}
                       markerStyle={localStyle.qrScannerMarker}
-                      ref={(node) => {
-                        this.camera = node;
-                      }}
                       containerStyle={localStyle.qrScannerContainer}
                       onRead={(scanResult) =>
                         scanSuccess(scanResult, this.camera)

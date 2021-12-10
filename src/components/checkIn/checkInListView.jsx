@@ -7,7 +7,9 @@ imports
 import React, { PureComponent } from "react";
 import { View, StyleSheet } from "react-native";
 import { ListItem } from "react-native-elements";
+import PropTypes from "prop-types";
 
+import { NavigationProps } from "../../prop-types";
 import config from "../../config/configProvider";
 import { formatDateString } from "../../services/utils";
 
@@ -40,15 +42,11 @@ class CheckInListView extends PureComponent {
    * @returns a style object for the listItem
    */
   getListItemStyle = () => {
-    const { questionnaireItemMap } = this.props;
-    if (
-      questionnaireItemMap &&
-      !questionnaireItemMap.done &&
-      questionnaireItemMap.started
-    ) {
+    const { done, started } = this.props;
+    if (started && !done) {
       return localStyle.containerTouched;
     }
-    if (!questionnaireItemMap.done && !questionnaireItemMap.started) {
+    if (!started && !done) {
       return localStyle.containerUntouched;
     }
     return localStyle.containerCompleted;
@@ -59,19 +57,15 @@ class CheckInListView extends PureComponent {
    * @returns accessibility hint
    */
   getAccessibilityHint = () => {
-    const { questionnaireItemMap } = this.props;
+    const { done, started } = this.props;
     let hint =
       config.text.accessibility.questionnaire.questionnaireCellHint +
       config.text.accessibility.questionnaire.questionnaire;
-    if (
-      questionnaireItemMap &&
-      !questionnaireItemMap.done &&
-      questionnaireItemMap.started
-    ) {
+    if (!done && started) {
       hint += config.text.accessibility.questionnaire.notFinished;
       return hint;
     }
-    if (!questionnaireItemMap.done && !questionnaireItemMap.notStarted) {
+    if (!done && !started) {
       hint += config.text.accessibility.questionnaire.notStarted;
       return hint;
     }
@@ -84,23 +78,19 @@ class CheckInListView extends PureComponent {
    * @returns
    */
   getChevronProps = () => {
-    const { questionnaireItemMap } = this.props;
-    if (
-      questionnaireItemMap &&
-      !questionnaireItemMap.done &&
-      !questionnaireItemMap.started
-    )
+    const { done, started } = this.props;
+    if (!done && !started)
       return {
         name: "dots-horizontal",
         color: config.theme.colors.secondary,
       };
 
-    if (questionnaireItemMap.started && !questionnaireItemMap.done)
+    if (started && !done)
       return {
         name: "pencil-outline",
         color: config.theme.colors.alert,
       };
-    if (questionnaireItemMap.done)
+    if (done)
       return {
         name: "check",
         color: config.theme.colors.success,
@@ -113,64 +103,76 @@ class CheckInListView extends PureComponent {
 
   render() {
     const {
-      categoriesLoaded,
+      dueDate,
       noNewQuestionnaireAvailableYet,
       navigation,
-      user,
+      firstTime,
+      status,
     } = this.props;
     return (
       <View style={localStyle.wrapper}>
         {/* if all categories are loaded AND there is a current questionnaire available render a single ListLink AND if the user ist still part of the study*/}
-        {categoriesLoaded &&
-          !noNewQuestionnaireAvailableYet &&
-          user?.status !== "off-study" && (
-            <ListItem
-              containerStyle={{
-                ...localStyle.containerStyle,
-                // get additional styling depending on the state of the questionnaire
-                ...this.getListItemStyle(),
-              }}
-              onPress={() => navigation.navigate("Survey")}
-              accessibilityLabel={`${
-                user.firstTime
+        {!noNewQuestionnaireAvailableYet && status !== "off-study" && (
+          <ListItem
+            containerStyle={{
+              ...localStyle.containerStyle,
+              // get additional styling depending on the state of the questionnaire
+              ...this.getListItemStyle(),
+            }}
+            onPress={() => navigation.navigate("Survey")}
+            accessibilityLabel={`${
+              firstTime
+                ? config.text.survey.surveyTitleFirstTime
+                : config.text.survey.surveyTitle
+            }. ${
+              config.text.survey.surveySubTitle +
+              formatDateString(new Date(dueDate))
+            }`}
+            accessibilityRole={config.text.accessibility.types.button}
+            accessibilityHint={this.getAccessibilityHint()}
+          >
+            <ListItem.Content>
+              {/* shows a special title for first-time-users or the regular title for all other users */}
+              <ListItem.Title style={localStyle.title}>
+                {firstTime
                   ? config.text.survey.surveyTitleFirstTime
-                  : config.text.survey.surveyTitle
-              }. ${
-                config.text.survey.surveySubTitle +
-                formatDateString(new Date(user.due_date))
-              }`}
-              accessibilityRole={config.text.accessibility.types.button}
-              accessibilityHint={this.getAccessibilityHint()}
-            >
-              <ListItem.Content>
-                {/* shows a special title for first-time-users or the regular title for all other users */}
-                <ListItem.Title style={localStyle.title}>
-                  {user.firstTime
-                    ? config.text.survey.surveyTitleFirstTime
-                    : config.text.survey.surveyTitle}
-                </ListItem.Title>
+                  : config.text.survey.surveyTitle}
+              </ListItem.Title>
 
-                {/* subtitle with formatted due date of the questionnaire */}
-                <ListItem.Subtitle style={localStyle.subTitle}>
-                  {config.text.survey.surveySubTitle +
-                    formatDateString(new Date(user.due_date))}
-                </ListItem.Subtitle>
-              </ListItem.Content>
-              {/* renders icon */}
-              <ListItem.Chevron
-                type="material-community"
-                size={12}
-                raised
-                containerStyle={{ backgroundColor: config.theme.colors.white }}
-                // get additional properties based on the state of the questionnaire
-                iconProps={this.getChevronProps()}
-              />
-            </ListItem>
-          )}
+              {/* subtitle with formatted due date of the questionnaire */}
+              <ListItem.Subtitle style={localStyle.subTitle}>
+                {config.text.survey.surveySubTitle +
+                  formatDateString(new Date(dueDate))}
+              </ListItem.Subtitle>
+            </ListItem.Content>
+            {/* renders icon */}
+            <ListItem.Chevron
+              type="material-community"
+              size={12}
+              raised
+              containerStyle={{ backgroundColor: config.theme.colors.white }}
+              // get additional properties based on the state of the questionnaire
+              iconProps={this.getChevronProps()}
+            />
+          </ListItem>
+        )}
       </View>
     );
   }
 }
+
+CheckInListView.propTypes = {
+  firstTime: PropTypes.bool,
+  navigation: NavigationProps.isRequired,
+  status: PropTypes.oneOf(["on-study", "off-study"]),
+  done: PropTypes.bool.isRequired,
+  started: PropTypes.bool.isRequired,
+};
+
+CheckInListView.defaultProps = {
+  firstTime: null,
+  status: null,
+};
 
 /***********************************************************************************************
 local styling
