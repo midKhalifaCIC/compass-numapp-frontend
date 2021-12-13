@@ -7,6 +7,7 @@ imports
 import { connect } from "react-redux";
 import React, { Component } from "react";
 import { bindActionCreators } from "redux";
+import PropTypes from "prop-types";
 
 import config from "../../config/configProvider";
 import localStorage from "../../services/localStorage/localStorage";
@@ -14,6 +15,8 @@ import localStorage from "../../services/localStorage/localStorage";
 import LoginScreen from "./loginScreen";
 import LandingScreen from "./landingScreen";
 import * as loginActions from "./loginActions";
+import { userActions } from "../../redux";
+import { UserProps, GlobalsProps } from "../../prop-types";
 
 /***********************************************************************************************
 component:
@@ -41,20 +44,20 @@ class LoginContainer extends Component {
    * configured in appConfig.js
    */
   componentDidMount = () => {
-    const { subjectId, actions, route } = this.props;
+    const { user, actions, route } = this.props;
     // logout of an existing user
-    if (subjectId) actions.logout();
+    if (user && user.subjectId) actions.logout();
 
     // triggers the auto-login when on the login-screen (only on DEV)
     if (config.appConfig.automateQrLogin && route.name === "Login") {
       // parses the input string to determine the subjectId (from the qr-code)
       const scannedId = this.checkQrCodeForUsername(
-        config.appConfig.automateQrLoginSubjectId || ""
+        config.appConfig.automateQrLoginSubjectId
       );
       // sets the subjectId defined in appConfig.js
-      actions.updateSubjectId(scannedId);
+      actions.updateUser({ subjectId: scannedId });
       // triggers the login
-      setTimeout(async () => actions.sendCredentials(scannedId), 1000);
+      // setTimeout(async () => actions.updateUser(scannedId), 1000);
     } else {
       this.autoLoginLastUser();
     }
@@ -64,8 +67,8 @@ class LoginContainer extends Component {
    * checks after each update if the user is logged in and (if yes) navigates to the checkIn-screen
    */
   componentDidUpdate = () => {
-    const { loggedIn, navigation } = this.props;
-    if (loggedIn) navigation.navigate("SignedIn", { screen: "CheckIn" });
+    const { user, navigation } = this.props;
+    if (user && user.subjectId) navigation.navigate("CheckIn");
   };
 
   // class methods
@@ -82,7 +85,7 @@ class LoginContainer extends Component {
     // logs the user in
     if (lastSubjectId) {
       actions.autoLoginLastUser();
-      actions.sendCredentials(lastSubjectId);
+      actions.updateUser({ subjectId: lastSubjectId });
     }
   };
 
@@ -120,40 +123,44 @@ class LoginContainer extends Component {
     const subjectId = this.checkQrCodeForUsername(scanResult.data);
 
     // sets the subjectId defined in appConfig.js
-    actions.updateSubjectId(subjectId);
+    actions.updateUser(subjectId);
     // triggers the login
-    setTimeout(() => actions.sendCredentials(subjectId, camera), 500);
+    // setTimeout(() => actions.sendCredentials(subjectId, camera), 500);
   };
 
   // rendering
   /*-----------------------------------------------------------------------------------*/
 
   render() {
-    const {
-      loading,
-      actions,
-      navigation,
-      loginUnauthorized,
-      loginError,
-      route,
-    } = this.props;
+    const { actions, navigation, loginUnauthorized, route, globals } =
+      this.props;
     // checks the currently selected route
     return route.name === "Login" ? (
       // if on Login route
       <LoginScreen
         actions={actions}
-        loading={loading}
-        loginError={loginError}
+        loading={globals.loading}
+        error={globals.error}
         loginUnauthorized={loginUnauthorized}
         navigation={navigation}
         scanSuccess={this.scanSuccess}
       />
     ) : (
       // if on Landing route
-      <LandingScreen loading={loading} navigation={navigation} />
+      <LandingScreen loading={globals.loading} navigation={navigation} />
     );
   }
 }
+
+LoginContainer.propTypes = {
+  globals: GlobalsProps.isRequired,
+  user: UserProps.isRequired,
+  actions: PropTypes.shape({
+    updateUser: PropTypes.func.isRequired,
+    sendCredentials: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
+  }).isRequired,
+};
 
 /***********************************************************************************************
 redux
@@ -163,10 +170,13 @@ redux
 // updated properties are then available from the state. actions can be accessed through
 // props.actions.
 
-const mapStateToProps = (state) => state.Login;
+const mapStateToProps = (state) => ({
+  user: state.User,
+  globals: state.Globals,
+});
 
 const mapDispatchToProps = (dispatch) => ({
-  actions: bindActionCreators(loginActions, dispatch),
+  actions: bindActionCreators({ ...loginActions, ...userActions }, dispatch),
 });
 
 /***********************************************************************************************

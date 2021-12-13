@@ -1,25 +1,29 @@
+/* eslint-disable camelcase */
 // (C) Copyright IBM Deutschland GmbH 2021.  All rights reserved.
 
 /***********************************************************************************************
 imports
 ***********************************************************************************************/
 
+import messaging from "@react-native-firebase/messaging";
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 import { Alert } from "react-native";
 import { connect } from "react-redux";
-import React, { Component } from "react";
 import { bindActionCreators } from "redux";
-
-import messaging from "@react-native-firebase/messaging";
-import store from "../../store";
-
-import loggedInClient from "../../services/rest/loggedInClient";
+import config from "../../config/configProvider";
+import {
+  GlobalsProps,
+  NavigationProps,
+  QuestionnaireProps,
+  UserProps,
+} from "../../prop-types";
+import { questionnaireActions, sharedActions, userActions } from "../../redux";
+import store from "../../redux/store";
 import localStorage from "../../services/localStorage/localStorage";
 import documentCreator from "../../services/questionnaireAnalyzer/questionnaireAnalyzer";
-
-import SurveyScreen from "./surveyScreen";
-import * as checkInActions from "./checkInActions";
+import loggedInClient from "../../services/rest/loggedInClient";
 import CheckInScreen from "./checkInScreen";
-import config from "../../config/configProvider";
 
 /***********************************************************************************************
 component:
@@ -36,12 +40,10 @@ class CheckInContainer extends Component {
    * triggers the update of the user after mounting the checkIn-template
    */
   componentDidMount = () => {
-    const { route } = this.props;
-    if (route.name === "CheckIn") {
-      setTimeout(() => {
-        this.updateUser();
-      }, 0);
-    }
+    // TODO remove 'timeout' when spinner is not modal anymore
+    setTimeout(() => {
+      this.updateUser();
+    }, 0);
   };
 
   /**
@@ -50,8 +52,11 @@ class CheckInContainer extends Component {
    * any content to render
    */
   componentDidUpdate = () => {
-    const { questionnaireItemMap, navigation } = this.props;
-    if (!questionnaireItemMap) navigation.navigate("CheckIn");
+    // const {
+    //   questionnaire: { itemMap },
+    //   navigation,
+    // } = this.props;
+    // if (!itemMap) navigation.navigate("CheckIn");
   };
 
   // methods: push
@@ -123,46 +128,46 @@ class CheckInContainer extends Component {
   /**
    * tries to procure the current questionnaire
    */
-  getQuestionnaire = async () => {
-    const { actions, user } = this.props;
-    let response;
+  // getQuestionnaire = async () => {
+  //   const { actions, user } = this.props;
+  //   let response;
 
-    // redux output
-    actions.getQuestionnaireStart();
+  //   // redux output
+  //   actions.getQuestionnaireStart();
 
-    // gets the questionnaire with the correct id
-    await loggedInClient
-      .getBaseQuestionnaire(user.current_questionnaire_id)
-      // success
-      .then((resp) => {
-        setTimeout(async () => {
-          // persists the questionnaire
-          actions.getQuestionnaireSuccess(resp.data || {});
-        }, 0);
+  //   // gets the questionnaire with the correct id
+  //   await loggedInClient
+  //     .getBaseQuestionnaire(user.current_questionnaire_id)
+  //     // success
+  //     .then((resp) => {
+  //       setTimeout(async () => {
+  //         // persists the questionnaire
+  //         actions.getQuestionnaireSuccess(resp.data || {});
+  //       }, 0);
 
-        response = resp.data;
-      })
-      // fail: displays an alert window with an error output and updates the state on button-click
-      .catch((error) => {
-        Alert.alert(
-          config.text.generic.errorTitle,
-          config.text.generic.sendError,
-          [
-            {
-              text: config.text.generic.ok,
-              onPress: () => {
-                actions.getQuestionnaireFail(error || "n/a");
-              },
-            },
-          ],
-          { cancelable: false }
-        );
+  //       response = resp.data;
+  //     })
+  //     // fail: displays an alert window with an error output and updates the state on button-click
+  //     .catch((error) => {
+  //       Alert.alert(
+  //         config.text.generic.errorTitle,
+  //         config.text.generic.sendError,
+  //         [
+  //           {
+  //             text: config.text.generic.ok,
+  //             onPress: () => {
+  //               actions.getQuestionnaireFail(error || "n/a");
+  //             },
+  //           },
+  //         ],
+  //         { cancelable: false }
+  //       );
 
-        response = error;
-      });
+  //       response = error;
+  //     });
 
-    return response;
-  };
+  //   return response;
+  // };
 
   // methods: updating user
   /*-----------------------------------------------------------------------------------*/
@@ -171,22 +176,22 @@ class CheckInContainer extends Component {
    * displays an alert-window after failing to update the user
    * @param  {object} error httperror
    */
-  updateUserFail = (error) => {
-    const { actions } = this.props;
-    Alert.alert(
-      config.text.generic.info,
-      config.text.generic.updateError,
-      [
-        {
-          text: config.text.generic.ok,
-          onPress: () => {
-            actions.updateUserFail(error);
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
+  // updateUserFail = (error) => {
+  //   const { actions } = this.props;
+  //   Alert.alert(
+  //     config.text.generic.info,
+  //     config.text.generic.updateError,
+  //     [
+  //       {
+  //         text: config.text.generic.ok,
+  //         onPress: () => {
+  //           actions.updateUserFail(error);
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: false }
+  //   );
+  // };
 
   /**
    * is executed after the user was successfully received from the server.
@@ -194,6 +199,7 @@ class CheckInContainer extends Component {
    * @param {any} data
    */
   updateUserSuccess = async (data) => {
+    // TODO: still necessary?
     const { user, actions, noNewQuestionnaireAvailableYet } = this.props;
     // TODO: remove workaround
     // eslint-disable-next-line no-param-reassign
@@ -254,49 +260,27 @@ class CheckInContainer extends Component {
    * @param  {object} [userdata]
    */
   updateUser = (userdata) => {
-    const { actions } = this.props;
+    const {
+      actions,
+      questionnaire: { FHIR },
+    } = this.props;
 
     // redux output
-    actions.updateUserStart();
-
-    if (userdata) {
-      // skips the rest call
-      this.updateUserSuccess(userdata);
-    } else {
-      // gets the user from the server
-      loggedInClient.getUserUpdate().then(
-        (res) => this.updateUserSuccess(res.data),
-        (error) => this.updateUserFail(error)
-      );
-    }
+    actions
+      .updateUser(userdata)
+      .then(({ payload: { current_questionnaire_id, error } }) => {
+        if (
+          !error &&
+          FHIR &&
+          `${FHIR.url}|${FHIR.version}` !== current_questionnaire_id
+        ) {
+          actions.deleteQuestionnaire();
+        }
+      });
   };
 
   // methods: cache data handling
   /*-----------------------------------------------------------------------------------*/
-
-  /**
-   * checks if a questionnaire and its answers might have been persisted in a previous
-   * session. if so it will be loaded, if not a new one from the server procured
-   */
-  checkForCachedData = async () => {
-    const { actions } = this.props;
-
-    // gets the locally persisted questionnaireItemMap (if there is one)
-    const map = await localStorage.loadQuestionnaireItemMap();
-    // gets the locally persisted categories-set (if there is one)
-    const list = await localStorage.loadCategories();
-
-    // loads it as current questionnaire including answers (if both objects are present)
-    if (map && list) {
-      actions.loadLocalQuestionnaire(map, list);
-    }
-    // loads the current questionnaire from the server
-    else {
-      setTimeout(() => {
-        this.getQuestionnaire();
-      }, 250);
-    }
-  };
 
   /**
    * displays an alert and triggers the deletion of the local questionnaire
@@ -306,13 +290,14 @@ class CheckInContainer extends Component {
     setTimeout(() => {
       Alert.alert(
         config.text.generic.info,
-        message ? message + config.text.generic.infoRemoval : config.text.generic.infoRemoval,
+        message
+          ? message + config.text.generic.infoRemoval
+          : config.text.generic.infoRemoval,
         [
           {
             text: config.text.generic.ok,
             onPress: async () => {
-              await actions.deleteLocalQuestionnaire();
-
+              await actions.deleteQuestionnaire();
               setTimeout(() => {
                 this.getQuestionnaire();
               }, 0);
@@ -336,81 +321,34 @@ class CheckInContainer extends Component {
     const { actions } = this.props;
 
     actions.sendQuestionnaireResponseFail(error);
-    if(error.response.status === 409){
+    if (error.response.status === 409) {
       // deletes the locally persisted questionnaire, as it does not matches
-          // the one the user is supposed to look at
-          setTimeout(() => {
-            this.deleteLocalQuestionnaireData(config.text.generic.sendErrorTwoDevices);
-          }, 0);
-    }
-    else{
+      // the one the user is supposed to look at
+      setTimeout(() => {
+        this.deleteLocalQuestionnaireData(
+          config.text.generic.sendErrorTwoDevices
+        );
+      }, 0);
+    } else {
       setTimeout(() => {
         Alert.alert(
           config.text.generic.errorTitle,
           config.text.generic.sendError
         );
       }, 0);
-    };
     }
-
-  /**
-   * handles the export success, deletes the local questionnaire and then updates the user
-   * @param  {object} response http response
-   */
-  exportAndUploadQuestionnaireResponseSuccess = async (response) => {
-    const { actions } = this.props;
-    actions.sendQuestionnaireResponseSuccess(response);
-    actions.deleteLocalQuestionnaire();
-
-    setTimeout(async () => {
-      await this.updateUser(response.data);
-    }, 0);
-
-    setTimeout(() => {
-      Alert.alert(
-        config.text.generic.successTitle,
-        config.text.generic.sendSuccess
-      );
-    }, 0);
-  };
-
-  /**
-   * creates the questionnaire-response and sends it out
-   */
-  exportAndUploadQuestionnaireResponseStart = async () => {
-    const { actions, user } = this.props;
-    // redux output
-    actions.sendQuestionnaireResponseStart();
-
-    /** generates the response-json
-     * @type {ExportData}
-     */
-    const exportData = documentCreator.createResponseJSON();
-
-    // sends the questionnaire
-    await loggedInClient
-      .sendQuestionnaire(
-        exportData.body,
-        exportData.triggerMap,
-        user.subjectId,
-        user.current_questionnaire_id,
-        user.current_instance_id
-      )
-      .then(
-        (response) =>
-          this.exportAndUploadQuestionnaireResponseSuccess(response),
-        (error) => this.exportAndUploadQuestionnaireResponseFail(error)
-      );
   };
 
   /**
    * checks if the questionnaire was completed and if true triggers the export
    */
-  exportAndUploadQuestionnaireResponse = () => {
-    const { questionnaireItemMap } = this.props;
+  questionnaireResponseDialogHandler = () => {
+    const {
+      questionnaire: { itemMap, done },
+    } = this.props;
 
     // if the questionnaire was NOT completed
-    if (questionnaireItemMap && !questionnaireItemMap.done) {
+    if (itemMap && !done) {
       // shows a message remembering the user to complete the questionnaire
       Alert.alert(
         config.text.generic.info,
@@ -432,7 +370,7 @@ class CheckInContainer extends Component {
         [
           {
             text: config.text.survey.sendFinished,
-            onPress: this.exportAndUploadQuestionnaireResponseStart,
+            onPress: this.sendQuestionnaireResponse,
           },
           {
             text: config.text.generic.abort,
@@ -442,6 +380,32 @@ class CheckInContainer extends Component {
         { cancelable: false }
       );
     }
+  };
+
+  sendQuestionnaireResponse = () => {
+    const {
+      questionnaire: { itemMap, categories, FHIR },
+      actions,
+    } = this.props;
+    const responseJson = documentCreator.createResponseJSON(
+      categories,
+      itemMap,
+      FHIR
+    );
+    actions.sendQuestionnaireResponse(responseJson).then(
+      // trigger user update when questionnaire response was sent successfully
+      // onFulfilled:
+      ({ payload }) => {
+        if (!payload.error) {
+          actions.updateUser();
+        } else {
+          Alert.alert(
+            config.text.generic.errorTitle,
+            config.text.generic.sendError
+          );
+        }
+      }
+    );
   };
 
   // methods: special report
@@ -609,38 +573,17 @@ class CheckInContainer extends Component {
    * checks the current route name and renders the appropriate template
    */
   render() {
-    const {
-      actions,
-      navigation,
-      user,
-      loading,
-      categories,
-      categoriesLoaded,
-      currentPageIndex,
-      currentCategoryIndex,
-      questionnaireItemMap,
-      error401,
-      showDatePicker,
-      questionnaireError,
-      showQuestionnaireModal,
-      noNewQuestionnaireAvailableYet,
-      route,
-    } = this.props;
-    return route.name === "CheckIn" ? (
-      // if on CheckIn route
+    const { navigation, user, globals, questionnaire } = this.props;
+    return (
       <CheckInScreen
-        navigation={navigation}
-        loading={loading}
-        categoriesLoaded={categoriesLoaded}
-        error401={error401}
-        questionnaireError={questionnaireError}
         user={user}
-        noNewQuestionnaireAvailableYet={noNewQuestionnaireAvailableYet}
-        questionnaireItemMap={questionnaireItemMap}
+        navigation={navigation}
+        globals={globals}
+        questionnaire={questionnaire}
         getQuestionnaire={this.getQuestionnaire}
         deleteLocalDataAndLogout={this.deleteLocalDataAndLogout}
         exportAndUploadQuestionnaireResponse={
-          this.exportAndUploadQuestionnaireResponse
+          this.questionnaireResponseDialogHandler
         }
         exportAndUploadQuestionnaireResponseStart={
           this.exportAndUploadQuestionnaireResponseStart
@@ -648,43 +591,46 @@ class CheckInContainer extends Component {
         sendReport={this.sendReport}
         updateUser={this.updateUser}
       />
-    ) : (
-      // if on Survey route
-      <SurveyScreen
-        navigation={navigation}
-        actions={actions}
-        user={user}
-        categories={categories}
-        currentPageIndex={currentPageIndex}
-        currentCategoryIndex={currentCategoryIndex}
-        showDatePicker={showDatePicker}
-        questionnaireItemMap={questionnaireItemMap}
-        showQuestionnaireModal={showQuestionnaireModal}
-        exportAndUploadQuestionnaireResponse={
-          this.exportAndUploadQuestionnaireResponse
-        }
-      />
     );
   }
 }
+
+CheckInContainer.propTypes = {
+  user: UserProps.isRequired,
+  questionnaire: QuestionnaireProps.isRequired,
+  globals: GlobalsProps.isRequired,
+  navigation: NavigationProps.isRequired,
+  actions: PropTypes.shape({
+    deleteLocalData: PropTypes.func,
+    deleteQuestionnaire: PropTypes.func.isRequired,
+    updateUser: PropTypes.func,
+    sendQuestionnaireResponse: PropTypes.func,
+  }).isRequired,
+};
 
 /***********************************************************************************************
 redux
 ***********************************************************************************************/
 
-const mapStateToProps = (state) => state.CheckIn;
-
-const mapDispatchToProps = (dispatch) => ({
-  actions: bindActionCreators(checkInActions, dispatch),
+const mapStateToProps = (state) => ({
+  user: state.User,
+  globals: state.Globals,
+  questionnaire: state.Questionnaire,
 });
 
-const ConnectedCheckIn = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CheckInContainer);
+const mapDispatchToProps = (dispatch) => ({
+  actions: bindActionCreators(
+    {
+      ...userActions,
+      ...sharedActions,
+      ...questionnaireActions,
+    },
+    dispatch
+  ),
+});
 
 /***********************************************************************************************
 export
 ***********************************************************************************************/
 
-export { ConnectedCheckIn as CheckIn, CheckInContainer };
+export default connect(mapStateToProps, mapDispatchToProps)(CheckInContainer);

@@ -7,7 +7,7 @@ imports
 ***********************************************************************************************/
 
 import * as forge from "node-forge";
-import store from "../../store";
+// import store from "../../redux/store";
 import config from "../../config/configProvider";
 
 /***********************************************************************************************
@@ -20,8 +20,8 @@ encryption
  */
 const encrypt = (messageToBeEncrypted) => {
   // TODO: remove workaround
-  let pemString =
-    store?.getState().Login?.session?.recipientCertificatePemString;
+  let pemString = false;
+  // store?.getState().Login?.session?.recipientCertificatePemString;
   pemString =
     pemString === "false" || !pemString
       ? config.appConfig.defaultRecipientCertificatePemString

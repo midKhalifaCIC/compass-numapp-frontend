@@ -1288,7 +1288,7 @@ exports[`LOGIN RENDERING: <LoginScreen /> can be rendered 1`] = `
                       "width": "100%",
                     }
                   }
-                  fadeIn={false}
+                  fadeIn={true}
                   markerStyle={
                     Object {
                       "borderColor": "#1F2532",

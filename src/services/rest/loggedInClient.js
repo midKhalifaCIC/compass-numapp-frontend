@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // (C) Copyright IBM Deutschland GmbH 2021.  All rights reserved.
 
 // this file provides methods concerning the communication with the backend after the user
@@ -9,10 +10,9 @@ imports
 
 import axios from "axios";
 
-import store from "../../store";
+// import store from "../../redux/store";
 import config from "../../config/configProvider";
 import security from "../encryption/encryption";
-import localStorage from "../localStorage/localStorage";
 
 /***********************************************************************************************
 support functions
@@ -22,13 +22,7 @@ support functions
  * creates the Bearer token
  * @param  {string} [token] access token
  */
-
-const createAuthorizationToken = (token) => {
-  if (token) {
-    return `Bearer ${token}`;
-  }
-  return `Bearer ${store.getState().Login.session.accessToken}`;
-};
+const createAuthorizationToken = (token) => `Bearer ${token}`;
 
 /**
  * generates the encapsuled message that will be transmitted to the server.
@@ -66,12 +60,8 @@ clients
 /**
  * gets the subjectId and calls the getUser-endpoint
  */
-const getUserUpdate = async () => {
-  let { subjectId } = store.getState().Login;
-  if (!subjectId) subjectId = await localStorage.loadLastSubjectId();
-  return axios.get(config.appConfig.endpoints.getUser + subjectId);
-};
-
+const getUserUpdate = async (subjectId) =>
+  axios.get(config.appConfig.endpoints.getUser + subjectId);
 // push
 /*-----------------------------------------------------------------------------------*/
 
@@ -88,7 +78,7 @@ const updateDeviceToken = async (subjectId, token) =>
     },
     {
       headers: {
-        Authorization: createAuthorizationToken(),
+        Authorization: createAuthorizationToken(subjectId),
         Accept: "application/json",
       },
     }
@@ -107,7 +97,7 @@ const sendReport = async (subjectId) =>
     generateEncapsuledMessage(subjectId, "report"),
     {
       headers: {
-        Authorization: createAuthorizationToken(),
+        Authorization: createAuthorizationToken(subjectId),
         Accept: "application/json",
       },
       params: {
@@ -143,7 +133,7 @@ const sendQuestionnaire = async (
     generateEncapsuledMessage(subjectId, "questionnaire_response", body),
     {
       headers: {
-        Authorization: createAuthorizationToken(),
+        Authorization: createAuthorizationToken("subjectId"),
         Accept: "application/json",
       },
       params: {
@@ -163,13 +153,17 @@ const sendQuestionnaire = async (
  * procures the questionnaire from the backend
  * @param  {string} questionnaireId id of the questionnaire that the user is supposed to fill out
  */
-const getBaseQuestionnaire = async (questionnaireId) =>
-  axios.get(config.appConfig.endpoints.getQuestionnaire + questionnaireId, {
-    headers: {
-      Authorization: createAuthorizationToken(),
-      Accept: "application/json",
-    },
-  });
+const getBaseQuestionnaire = async (questionnaireId, authToken) =>
+  axios.get(
+    config.appConfig.endpoints.getQuestionnaire +
+      encodeURIComponent(questionnaireId),
+    {
+      headers: {
+        Authorization: authToken,
+        Accept: "application/json",
+      },
+    }
+  );
 
 /***********************************************************************************************
 export

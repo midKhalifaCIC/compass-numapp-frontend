@@ -21,7 +21,7 @@ operations
  */
 const loadLastSubjectId = async () => {
   try {
-    return await EncryptedStorage.getItem(config.appConfig.lastSubjectId);
+    // return await EncryptedStorage.getItem(config.appConfig.lastSubjectId);
   } catch (error) {
     console.error(error);
     return null;
@@ -242,8 +242,8 @@ const removeCategories = async (subjectId) => {
  * @param  {QuestionnaireItemMap} map questionnaireItemMap object of the user
  * @param  {string} [subjectId] if of the user
  */
-const persistQuestionnaireItemMap = async (map, subjectId) => {
-  const id = subjectId || (await loadLastSubjectId());
+const persistQuestionnaireItemMap = async (map) => {
+  const id = await loadLastSubjectId();
   if (!id) return;
 
   const stringToBePersisted = map instanceof String ? map : JSON.stringify(map);
@@ -296,6 +296,53 @@ const removeQuestionnaireItemMap = async (subjectId) => {
   }
 };
 
+/**
+ * persist the metadata of the current questionnaire
+ * @param {*} metaData
+ */
+const persistQuestionnaireMetaData = async (metaData) => {
+  const id = await loadLastSubjectId();
+  if (!id) return;
+
+  try {
+    EncryptedStorage.setItem(
+      `${config.appConfig.localStorageMap}_${id}`,
+      JSON.stringify(metaData)
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const loadQuestionnaireMetaData = async (subjectId) => {
+  const id = subjectId || (await loadLastSubjectId());
+  if (!id) return null;
+
+  try {
+    return JSON.parse(
+      await EncryptedStorage.getItem(
+        `${config.appConfig.lastQuestionnaireMetadata}_${id}`
+      )
+    );
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const removeQuestionnaireMeta = async (subjectId) => {
+  const id = subjectId || (await loadLastSubjectId());
+  if (!id) return;
+
+  try {
+    EncryptedStorage.removeItem(
+      `${config.appConfig.lastQuestionnaireMetadata}_${id}`
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // cleanup
 /*-----------------------------------------------------------------------------------*/
 
@@ -303,7 +350,11 @@ const removeQuestionnaireItemMap = async (subjectId) => {
  * just clears all
  */
 const clearAll = async () => {
-  await EncryptedStorage.clear();
+  try {
+    await EncryptedStorage.clear();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 /***********************************************************************************************
@@ -326,6 +377,10 @@ export default {
   persistLastQuestionnaireId,
   loadLastQuestionnaireId,
   removeLastSubjectId,
+
+  persistQuestionnaireMetaData,
+  loadQuestionnaireMetaData,
+  removeQuestionnaireMeta,
 
   persistFCMToken,
   loadFCMToken,

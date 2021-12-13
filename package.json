@@ -26,9 +26,11 @@
     "@react-native-picker/picker": "^2.0.0",
     "@react-navigation/native": "^6.0.4",
     "@react-navigation/stack": "^6.0.9",
+    "@reduxjs/toolkit": "^1.6.2",
     "axios": ">=0.21.4",
     "buffer": "^6.0.3",
     "node-forge": "^0.10.0",
+    "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-native": "0.64.2",
     "react-native-camera": "^4.1.1",
@@ -47,6 +49,7 @@
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
