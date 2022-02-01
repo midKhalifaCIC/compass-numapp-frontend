@@ -325,7 +325,7 @@ class CheckInContainer extends Component {
     const list = await localStorage.loadCategories();
 
     // loads it as current questionnaire including answers (if both objects are present)
-    if (map && list) {
+    if (false) {
       actions.loadLocalQuestionnaire(map, list);
     }
     // loads the current questionnaire from the server

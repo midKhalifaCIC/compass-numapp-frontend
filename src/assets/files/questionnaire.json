@@ -1,0 +1,1009 @@
+{
+  "resourceType": "Questionnaire",
+  "url": "http://hl7.org/fhir/Questionnaire/Fragebogen_Psychosomatik",
+  "identifier": [
+    {
+      "use": "official",
+      "system": "urn:UMOID:",
+      "value": "Fragebogen Psychosomatik"
+    }
+  ],
+  "language": "de",
+  "version": "0.1",
+  "title": "Wochenbericht",
+  "status": "draft",
+  "subjectType": ["Patient"],
+  "date": "2022-01-31",
+  "publisher": "Universitätsmedizin Mainz",
+  "purpose": "Initiale Befragung zur Charakterisierung des Probanden/der Probandin",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Therapieziele",
+      "type": "group",
+      "definition": "f6725f75-2ea2-4b8a-9268-bb1b98f10978",
+      "item": [
+        {
+          "linkId": "1.1",
+          "text": "Bitte tragen Sie unten Ihre für diese Behandlung vereinbarten Therapieziele ein und geben Sie zusätulich mit einer Zahl von 0 bis 10 an, inwiefern Sie diesen nähergekommen sind (0 = überhaupt nicht, 10 = Ziel vollständig erreicht):",
+          "type": "group",
+          "definition": "6601fb58-2236-452d-9795-8dc66be83e4f",
+          "item": [
+            {
+              "text": "Therapieziel 1:",
+              "type": "group",
+              "definition": "edda4acb-0a62-4b70-8ddd-97c946e7d540",
+              "linkId": "1.1.1",
+              "item": [
+                {
+                  "text": "Inhalt",
+                  "type": "string",
+                  "definition": "fd86158a-d088-4a6e-96a9-e96e196cdeed",
+                  "linkId": "1.1.1.1"
+                },
+                {
+                  "text": "Bewertung",
+                  "type": "integer",
+                  "definition": "050dd4df-e42d-4723-b7c6-89a622d0040f",
+                  "linkId": "1.1.1.2",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "slider"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                      "valueString": "0"
+                    },
+                    {
+                      "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                      "valueString": "10"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                      "valueInteger": 1
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                      "valueInteger": 0
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                      "valueInteger": 10
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "text": "Therapieziel 2:",
+              "type": "group",
+              "definition": "edda4acb-0a62-4b70-8ddd-97c946e7d540",
+              "linkId": "1.1.2",
+              "item": [
+                {
+                  "text": "Inhalt",
+                  "type": "string",
+                  "definition": "fd86158a-d088-4a6e-96a9-e96e196cdeed",
+                  "linkId": "1.1.2.1"
+                },
+                {
+                  "text": "Bewertung",
+                  "type": "integer",
+                  "definition": "050dd4df-e42d-4723-b7c6-89a622d0040f",
+                  "linkId": "1.1.2.2",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "slider"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                      "valueString": "0"
+                    },
+                    {
+                      "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                      "valueString": "10"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                      "valueInteger": 1
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                      "valueInteger": 0
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                      "valueInteger": 10
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "text": "Therapieziel 3:",
+              "type": "group",
+              "definition": "edda4acb-0a62-4b70-8ddd-97c946e7d540",
+              "linkId": "1.1.3",
+              "item": [
+                {
+                  "text": "Inhalt",
+                  "type": "string",
+                  "definition": "fd86158a-d088-4a6e-96a9-e96e196cdeed",
+                  "linkId": "1.1.3.1"
+                },
+                {
+                  "text": "Bewertung",
+                  "type": "integer",
+                  "definition": "050dd4df-e42d-4723-b7c6-89a622d0040f",
+                  "linkId": "1.1.3.2",
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                      "valueCodeableConcept": {
+                        "coding": [
+                          {
+                            "system": "http://hl7.org/fhir/questionnaire-item-control",
+                            "code": "slider"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                      "valueString": "0"
+                    },
+                    {
+                      "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                      "valueString": "10"
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                      "valueInteger": 1
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                      "valueInteger": 0
+                    },
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                      "valueInteger": 10
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "1.2",
+          "text": "Wenn Sie Ihren Therapiezielen nähergekommen sind, in welcher Hinsicht? Wie haben Sie das bemerkt?",
+          "type": "string"
+        },
+        {
+          "linkId": "1.3",
+          "text": "Was war hilfreich oder hinderlich bei der Arbeit an Ihren Therapiezielen?",
+          "type": "string"
+        },
+        {
+          "linkId": "1.4",
+          "text": "Wenn es keine positiven Veränderungen gegeben hat: Bitte machen Sie Vorschläge, was für Sie hilfreich sein könnte, um Ihre Ziele erreichen zu können. ",
+          "type": "string"
+        },
+        {
+          "linkId": "1.5",
+          "text": "Was hat Sie in der vergangenen Woche emotional besonders berührt?",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "text": "Befinden",
+      "type": "group",
+      "definition": "5f74ada8-7d45-4f8a-b407-87549379df41",
+      "item": [
+        {
+          "linkId": "2.1",
+          "text": "Wie oft fühlten Sie sich im Verlauf der letzten 2 Wochen durch die folgenden Beschwerden beeinträchtigt?",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "2.1.1",
+              "text": "Wenig Interesse oder Freude an Ihren Tätigkeiten",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.2",
+              "text": "Niedergeschlagenheit, Schwermut oder Hoffnungslosigkeit",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.3",
+              "text": "Schwierigkeiten ein- oder durchzuschlafen oder vermehrter Schlaf",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.4",
+              "text": "Müdigkeit oder Gefühl, keine Energie zu haben ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.5",
+              "text": "Verminderter Appetit oder übermäßiges Bedürfnis zu essen ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.6",
+              "text": "Schlechte Meinung von sich selbst; Gefühl, ein Versager zu sein oder die Familie enttäuscht zu haben",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.7",
+              "text": "Schwierigkeiten, sich auf etwas zu konzentrieren, z.B. beim Zeitunglesen oder Fernsehen ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.8",
+              "text": "Waren Ihre Bewegungen oder Ihre Sprache so verlangsamt, dass es auch anderen auffallen würde? Oder waren Sie im Gegenteil „zappelig“ oder ruhelos und hatten dadurch einen stärkeren Bewegungsdrang als sonst?",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.1.9",
+              "text": "Gedanken, dass Sie lieber tot wären oder sich Leid zufügen möchten",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            }
+          ],
+          "required": true
+        },
+        {
+          "linkId": "2.2",
+          "text": "Wie oft fühlten Sie sich im Verlauf der letzten 2 Wochen durch die folgenden Beschwerden beeinträchtigt?",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "2.2.1",
+              "text": "Nervosität, Ängstlichkeit oder Anspannung ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.2",
+              "text": "Nicht in der Lage sein, Sorgen zu stoppen oder zu kontrollieren ….",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.3",
+              "text": "Übermäßige Sorgen bezüglich verschiedener Angelegenheiten ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.4",
+              "text": "Schwierigkeiten zu entspannen ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.5",
+              "text": "Rastlosigkeit, so dass Stillsitzen schwer fällt ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.6",
+              "text": "Schnelle Verärgerung oder Gereiztheit",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.7",
+              "text": "Gefühl der Angst, so als würde etwas Schlimmes passieren",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.8",
+              "text": "Ich erlebe mich wie abgetrennt von meiner Umgebung oder diese erscheint mir unwirklich, so als ob ein Schleier zwischen mir und der äußeren Welt wäre",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.2.9",
+              "text": "Aus heiterem Himmel fühle ich mich fremd, als ob ich nicht wirklich wäre oder als ob ich von der Welt abgeschnitten wäre.",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "An einzelnen Tagen" },
+                { "valueString": "An mehr als der Hälfte der Tage" },
+                { "valueString": "Beinahe jeden Tag" }
+              ],
+              "required": true
+            }
+          ],
+          "required": true
+        },
+        {
+          "linkId": "2.3",
+          "text": "Wie stark fühlten Sie sich im Verlauf der letzten 7 Tage durch die folgenden Beschwerden beeinträchtigt?",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "2.3.1",
+              "text": "Bauchschmerzen oder Verdauungsbeschwerden",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.2",
+              "text": "Rückenschmerzen",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.3",
+              "text": "Schmerzen in Armen, Beinen oder Gelenken",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.4",
+              "text": "Kopfschmerzen ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.5",
+              "text": "Schmerzen im Brustbereich oder Kurzatmigkeit",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.6",
+              "text": "Schwindel",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.7",
+              "text": "Müdigkeit oder Gefühl, keine Energie zu haben",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.3.8",
+              "text": "Schlafstörungen ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Gar nicht" },
+                { "valueString": "Wenig" },
+                { "valueString": "Mittel" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            }
+          ],
+          "required": true
+        },
+        {
+          "linkId": "2.4",
+          "text": "Nachfolgend finden Sie eine Liste von Problemen und Beschwerden, die man manchmal hat. Entscheiden Sie bitte jeweils, wie sehr Sie in den letzten 7 Tagen durch diese Beschwerden gestört oder bedrängt worden sind. \n\n Wie sehr litten Sie in den letzten 7 Tagen unter … ?",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "2.4.1",
+              "text": "Gefühlsausbrüchen, gegenüber denen Sie machtlos waren",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.2",
+              "text": "dem Gefühl, dass es Ihnen schwer fällt, etwas anzufangen",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.3",
+              "text": "dem Gefühl, sich zu viele Sorgen machen zu müssen",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.4",
+              "text": "Verletzlichkeit in Gefühlsdingen",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.5",
+              "text": "dem Gefühl, dass andere Sie beobachten oder über Sie reden",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.6",
+              "text": "dem Gefühl, gespannt oder aufgeregt zu sein",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.7",
+              "text": "Schweregefühl in den Armen oder den Beinen",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.8",
+              "text": "Nervosität, wenn Sie alleine gelassen werden",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.4.9",
+              "text": "Einsamkeitsgefühlen, selbst wenn Sie in Gesellschaft sind ",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Ein wenig" },
+                { "valueString": "Ziemlich" },
+                { "valueString": "Stark" },
+                { "valueString": "Sehr stark" }
+              ],
+              "required": true
+            }
+          ],
+          "required": true
+        },
+        {
+          "linkId": "2.5",
+          "text": "Im Folgenden finden Sie eine Reihe von Aussagen zu Ihrem Umgang mit problematischen Gefühlen in der letzten Woche. Bitte beantworten Sie die Fragen spontan, indem Sie die Antwort aussuchen und ankreuzen, die Ihnen am passendsten erscheint.\n\nIn der letzten Woche...",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "2.5.1",
+              "text": "schenkte ich meinen Gefühlen Aufmerksamkeit.",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Selten" },
+                { "valueString": "Manchmal" },
+                { "valueString": "Oft" },
+                { "valueString": "(Fast) immer" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.5.2",
+              "text": "war mir klar, was ich gerade fühlte.",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Selten" },
+                { "valueString": "Manchmal" },
+                { "valueString": "Oft" },
+                { "valueString": "(Fast) immer" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.5.3",
+              "text": "versuchte ich, mich in belastenden Situationen selber aufzumuntern.",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Selten" },
+                { "valueString": "Manchmal" },
+                { "valueString": "Oft" },
+                { "valueString": "(Fast) immer" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.5.4",
+              "text": "konnte ich trotz negativer Gefühle das machen, was ich mir vorgenommen hatte.",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Selten" },
+                { "valueString": "Manchmal" },
+                { "valueString": "Oft" },
+                { "valueString": "(Fast) immer" }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.5.5",
+              "text": "fühlte ich mich stark genug, auch belastende Gefühle aushalten zu können.",
+              "type": "choice",
+              "answerOption": [
+                { "valueString": "Überhaupt nicht" },
+                { "valueString": "Selten" },
+                { "valueString": "Manchmal" },
+                { "valueString": "Oft" },
+                { "valueString": "(Fast) immer" }
+              ],
+              "required": true
+            }
+          ],
+          "required": true
+        },
+        {
+          "linkId": "2.6",
+          "text": "Die folgenden Wörter beschreiben unterschiedliche Gefühle und Empfindungen. Lesen Sie jedes Wort und stellen Sie dann auf dem Schieberegler die Intensität so ein, wie Sie sich im Moment fühlen.",
+          "type": "group",
+          "item": [
+            {
+              "linkId": "2.6.1",
+              "text": "ängtlich",
+              "type": "integer",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "slider"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                  "valueString": "Überhaupt nicht"
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                  "valueString": "Sehr"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                  "valueInteger": 1
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 10
+                }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.6.2",
+              "text": "verärgert",
+              "type": "integer",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "slider"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                  "valueString": "Überhaupt nicht"
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                  "valueString": "Sehr"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                  "valueInteger": 1
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 10
+                }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.6.3",
+              "text": "hoffnungsvoll",
+              "type": "integer",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "slider"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                  "valueString": "Überhaupt nicht"
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                  "valueString": "Sehr"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                  "valueInteger": 1
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 10
+                }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.6.4",
+              "text": "traurig",
+              "type": "integer",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "slider"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                  "valueString": "Überhaupt nicht"
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                  "valueString": "Sehr"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                  "valueInteger": 1
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 10
+                }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.6.5",
+              "text": "energiegeladen",
+              "type": "integer",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "slider"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                  "valueString": "Überhaupt nicht"
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                  "valueString": "Sehr"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                  "valueInteger": 1
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 10
+                }
+              ],
+              "required": true
+            },
+            {
+              "linkId": "2.6.6",
+              "text": "glücklich",
+              "type": "integer",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "slider"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/LowRangeLabel",
+                  "valueString": "Überhaupt nicht"
+                },
+                {
+                  "url": "https://num-compass.science/fhir/StructureDefinition/HighRangeLabel",
+                  "valueString": "Sehr"
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-sliderStepValue",
+                  "valueInteger": 1
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/minValue",
+                  "valueInteger": 0
+                },
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/maxValue",
+                  "valueInteger": 10
+                }
+              ],
+              "required": true
+            }
+          ],
+          "required": true
+        }
+      ],
+      "required": true
+    }
+  ]
+}
