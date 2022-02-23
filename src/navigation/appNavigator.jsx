@@ -10,7 +10,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import About from '../screens/about/aboutContainer';
 import Login from '../screens/login/loginContainer';
+import modalscreen from '../screens/modalscreen';
 import { CheckIn } from '../screens/checkIn/checkInContainer';
+import ModalScreen from '../screens/modalscreen';
 
 /***********************************************************************************************
 export and AppContainer-creation
@@ -40,12 +42,14 @@ function SignedInView() {
   const Stack = createNativeStackNavigator();
   return (
     <Stack.Navigator
+    
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,
       }}
       initialRouteName="CheckIn"
     >
+      <Stack.Screen name='Modal' component={ModalScreen} />
       <Stack.Screen name="CheckIn" component={CheckIn} />
       <Stack.Screen name="Survey" component={CheckIn} />
       <Stack.Screen name="About" component={About} />

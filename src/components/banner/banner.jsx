@@ -80,7 +80,7 @@ class Banner extends PureComponent {
               <Button
                 type="clear"
                 style={localStyle.bannerIcon}
-                onPress={() => updateUser()}
+                onPress={() =>  nav.navigate('Modal')}
                 icon={
                   <Icon
                     size={config.appConfig.scaleUiFkt(28)}
