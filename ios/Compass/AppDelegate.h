@@ -6,10 +6,11 @@
  */
 
 #import <UIKit/UIKit.h>
+#import <Expo/Expo.h>
 #import <React/RCTBridgeDelegate.h>
 #import <Firebase.h>
 
-@interface AppDelegate : UIResponder <RCTBridgeDelegate>
+@interface AppDelegate : EXAppDelegateWrapper <RCTBridgeDelegate>
 
 @property (nonatomic, strong) UIWindow *window;
 
