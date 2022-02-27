@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, Animated } from 'react-native';
 import Constants from 'expo-constants';
+import { Button } from 'react-native'
+
+
 
 const colors = [
   'white',
@@ -15,7 +18,8 @@ const colors = [
   'lilac',
 ];
 
-export default function ModalScreen() {
+export default function ModalScreen({navigation}) {
+     
   const [value, setValue] = React.useState(0);
 
   React.useEffect(() => {
@@ -25,8 +29,15 @@ export default function ModalScreen() {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors[value] }]}></View>
+    <View style={[styles.container, { backgroundColor: colors[value] }]}>
+        <Button
+         title="You just found the Easter Egg                 
+        ===> PRESS HERE!!!!!"
+        onPress={() =>  navigation.navigate('CheckIn')}
+        />
+    </View>
   );
+  
 }
 
 const styles = StyleSheet.create({
