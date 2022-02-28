@@ -6,16 +6,16 @@ import { Button } from 'react-native'
 
 
 const colors = [
-  'white',
-  'black',
-  'blue',
-  'green',
-  'pink',
-  'red',
-  'purple',
-  'yellow',
-  'gray',
-  'lilac',
+  '#ec7785',
+  '#353E55',
+  '#DFD8C8',
+  '#CABFAB',
+  '#E97A7A',
+  '#8B4F80',
+  '#8B4F80',
+  '#B9C0D5',
+  '#7393A7',
+  '#516091',
 ];
 
 export default function ModalScreen({navigation}) {
@@ -25,11 +25,12 @@ export default function ModalScreen({navigation}) {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setValue((v) => (v === 9 ? 0 : v + 1));
-    }, 100);
+    }, 250);
   }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors[value] }]}>
+      onload
         <Button
          title="You just found the Easter Egg                 
         ===> PRESS HERE!!!!!"
